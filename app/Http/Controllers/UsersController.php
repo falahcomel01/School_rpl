@@ -11,9 +11,10 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
 
-class UsersController extends Controller implements HasMiddleware
+class UsersController extends Controller //implements HasMiddleware
 {
-     public static function middleware(): array
+    
+ public static function middleware(): array
  {
     return [
 new Middleware('permission:view roles',only:['index']),
@@ -67,7 +68,7 @@ new Middleware('permission:delete roles',only:['destroy']),
         $user->name = $request->name;
         $user->email = $request->email;
         $user->username = $request->username;
-        $user->password = Hash::make($request->password);
+        $user->password = $request->password;
         $user->save();
 
         // assign role kalau ada

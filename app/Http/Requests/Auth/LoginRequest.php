@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Requests\Auth;
+
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -10,54 +11,54 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
-    protected $inputType;
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+    protected $field; // email atau username
+
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'email' => ['required_without:username', 'string', 'email','exists:users,email'],
-            'username' => ['required_without:email', 'string', 'exists:users,username'],
-            'password' => ['required', 'string'],
+            "input_type" => ["required", "string"],
+            "password" => ["required", "string"],
         ];
     }
 
-    /**
-     * Attempt to authenticate the request's credentials.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
+    protected function prepareForValidation()
+    {
+        $input = $this->input("input_type");
+
+        if (filter_var($input, FILTER_VALIDATE_EMAIL)) {
+            $this->field = "email";
+            $this->merge(["email" => $input]);
+        } else {
+            $this->field = "username";
+            $this->merge(["username" => $input]);
+        }
+    }
+
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only($this->inputType, 'password'), $this->boolean('remember'))) {
+        $credentials = [
+            $this->field => $this->input("input_type"),
+            "password" => $this->input("password"),
+        ];
+
+        if (! Auth::attempt($credentials, $this->boolean("remember"))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                $this->inputType => trans('auth.failed'),
+                "input_type" => trans("auth.failed"),
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
     }
 
-    /**
-     * Ensure the login request is not rate limited.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function ensureIsNotRateLimited(): void
     {
         if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
@@ -69,23 +70,15 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'input_type' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
         ]);
     }
 
-    /**
-     * Get the rate limiting throttle key for the request.
-     */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
-    }
-    protected function prepareForValidation()
-    {
-        $this->inputType = filter_var($this->input('input_type'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-        $this->merge([$this->inputType => $this->input('input_type')]);
+        return Str::lower($this->input("input_type")) . '|' . $this->ip();
     }
 }

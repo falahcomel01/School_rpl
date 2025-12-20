@@ -1,25 +1,22 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tambah Role Baru') }}
-        </h2>
-    </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-md rounded-lg p-6">
+    <div class="container-form">
+        <div class="card-form">
+            <div class="card-header">
+                Form Tambah Role
+            </div>
+
+            <div class="card-body">
 
                 {{-- Alert Success --}}
                 @if (session('success'))
-                    <div class="bg-green-100 text-green-800 p-3 rounded mb-4">
-                        {{ session('success') }}
-                    </div>
+                    <div class="alert success">{{ session('success') }}</div>
                 @endif
 
                 {{-- Alert Error --}}
                 @if ($errors->any())
-                    <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
-                        <ul class="list-disc list-inside">
+                    <div class="alert error">
+                        <ul>
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -31,61 +28,244 @@
                     @csrf
 
                     {{-- Nama Role --}}
-                    <div class="mb-6">
-                        <label for="name" class="block text-gray-700 font-medium mb-2">
-                            Nama Role
-                        </label>
+                    <div class="form-group">
+                        <label for="name">Nama Role</label>
                         <input type="text" name="name" id="name"
                                value="{{ old('name') }}"
-                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                               placeholder="contoh: admin, editor, kasir" required>
+                               placeholder="Contoh: admin, editor, kasir"
+                               required>
                     </div>
 
                     {{-- Permission Picker --}}
-                    <div class="mb-2 flex items-center justify-between gap-3">
-                        <label class="block text-gray-700 font-medium">Permissions</label>
-                        <div class="flex items-center gap-2">
-                            <input id="selectAll" type="checkbox" class="rounded border-gray-300">
-                            <label for="selectAll" class="text-sm text-gray-700">Pilih semua</label>
+                    <div class="form-group">
+                        <div class="label-flex">
+                            <label>Permissions</label>
+                            <div class="check-all">
+                                <input id="selectAll" type="checkbox">
+                                <label for="selectAll">Pilih Semua</label>
+                            </div>
+                        </div>
+
+                        <div class="grid-permissions">
+                            @if ($permissions->isNotEmpty())
+                                @foreach ($permissions as $permission)
+                                    <div class="perm-item">
+                                        <input type="checkbox"
+                                               id="permission-{{ $permission->id }}"
+                                               class="permItem"
+                                               name="permission[]"
+                                               value="{{ $permission->name }}">
+                                        <label for="permission-{{ $permission->id }}">
+                                            {{ $permission->name }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
                     </div>
 
-                    {{-- Grid Permission (tanpa pencarian) --}}
-                    <div class="grid grid-cols-4 mb-3">
-                    @if ($permissions->isNotEmpty())
-                        @foreach ($permissions as $permission)
-                            <div class="mt-3">
-                            <input type="checkbox" id="permission-{{ $permission->id }}"
-                            class="rounded" name="permission[]" value="{{
-                            $permission->name}}">
-                            <label for="permission-{{ $permission->id }}">{{
-                            $permission->name }}</label>
-                            </div>
-                        @endforeach
-                    @endif
-                    </div>
-
-                    <div class="flex justify-end mt-6">
-                        <a href="{{ route('roles.index') }}"
-                           class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2 hover:bg-gray-300 transition">
-                            Batal
-                        </a>
-                        <button type="submit"
-                                class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mr-2 hover:bg-gray-300 transition">
-                            Simpan
-                        </button>
+                    {{-- Tombol Aksi --}}
+                    <div class="tombol-aksi">
+                        <a href="{{ route('roles.index') }}" class="btn-batal">Batal</a>
+                        <button type="submit" class="btn-simpan">Simpan</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
 
-    {{-- Script kecil: pilih semua --}}
     <script>
-        const selectAll = document.getElementById('selectAll');
-        const items = document.querySelectorAll('.permItem');
-        selectAll?.addEventListener('change', e => {
-            items.forEach(i => { i.checked = e.target.checked; });
+        // Pilih semua permission
+        document.getElementById('selectAll')?.addEventListener('change', (e) => {
+            document.querySelectorAll('.permItem').forEach(i => {
+                i.checked = e.target.checked;
+            });
         });
     </script>
+
+    {{-- ==== CSS ====/ --}}
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8f9fb, #eef1f5);
+            font-family: "Poppins", sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .judul-halaman {
+            font-size: 26px;
+            font-weight: 700;
+            color: #b71c1c;
+            text-align: center;
+            margin-top: 35px;
+            margin-bottom: 15px;
+        }
+
+        .container-form {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 85vh;
+            padding: 40px 20px;
+        }
+
+        .card-form {
+            background: #fff;
+            width: 820px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .card-header {
+            background-color: #b71c1c;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 15px 25px;
+            border-bottom: 3px solid #a31616;
+            text-align: center;
+        }
+
+        .card-body {
+            padding: 40px 50px;
+        }
+
+        .alert {
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert.success {
+            background-color: #e6f9ee;
+            color: #1e8449;
+            border: 1px solid #a6e3b8;
+        }
+
+        .alert.error {
+            background-color: #fdecea;
+            color: #b71c1c;
+            border: 1px solid #f5b7b1;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #b71c1c;
+            box-shadow: 0 0 5px rgba(183, 28, 28, 0.3);
+            outline: none;
+        }
+
+        .label-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .check-all {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .grid-permissions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px 15px;
+            margin-top: 10px;
+        }
+
+        .perm-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #fafafa;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .perm-item:hover {
+            background: #f0f0f0;
+        }
+
+        .perm-item input {
+            accent-color: #b71c1c;
+            transform: scale(1.1);
+        }
+
+        .tombol-aksi {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 35px;
+        }
+
+        .btn-batal,
+        .btn-simpan {
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-batal {
+            background: #f3f3f3;
+            color: #555;
+            border: 1px solid #ccc;
+        }
+
+        .btn-batal:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-simpan {
+            background-color: #b71c1c;
+            color: white;
+            border: none;
+        }
+
+        .btn-simpan:hover {
+            background-color: #a31616;
+            transform: translateY(-1px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </x-app-layout>

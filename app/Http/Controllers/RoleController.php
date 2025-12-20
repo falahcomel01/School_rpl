@@ -9,132 +9,116 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
-    
-
 class RoleController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
- {
-    return [
-new Middleware('permission:view roles',only:['index']),
-new Middleware('permission:edit roles',only:['edit']),
-new Middleware('permission:create roles',only:['create']),
-new Middleware('permission:delete roles',only:['destroy']),
-    ];
- }
+    {
+        return [
+            new Middleware('permission:view roles', only: ['index']),
+            new Middleware('permission:show roles', only: ['show']),
+            new Middleware('permission:edit roles', only: ['edit', 'update']),
+            new Middleware('permission:create roles', only: ['create', 'store']),
+            new Middleware('permission:delete roles', only: ['destroy']),
+        ];
+    }
+
     /**
-     * Display a listing of the resource.
+     * 🧾 Tampilkan daftar role
      */
     public function index()
     {
-         $roles = Role::orderBy('name','asc')->paginate(10);
+        $roles = Role::with('permissions')->orderBy('name', 'asc')->paginate(10);
 
-       return view('roles.list',[
-        'roles' => $roles 
-          ]);
+        return view('roles.list', compact('roles'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * ➕ Form tambah role baru
      */
     public function create()
     {
-        $permissions = Permission::orderBy('name','ASC')->get();
-       return view('roles.create',[
-        'permissions' => $permissions
-       ]);
-
+        $permissions = Permission::orderBy('name', 'ASC')->get();
+        return view('roles.create', compact('permissions'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * 💾 Simpan role baru
      */
     public function store(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'name' => 'required|unique:roles|min:2'
-    ]);
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|unique:roles|min:2',
+        ]);
 
-    if ($validator->passes()) {
+        if ($validator->fails()) {
+            return redirect()->route('roles.create')->withInput()->withErrors($validator);
+        }
+
         $role = Role::create(['name' => $request->name]);
 
-        // ✅ perbaiki bagian ini
         if (!empty($request->permission)) {
             foreach ($request->permission as $permName) {
                 $role->givePermissionTo($permName);
             }
         }
 
-        return redirect()->route('roles.index')->with('berhasil', 'Role berhasil ditambahkan.');
-    } else {
-        return redirect()->route('roles.create')->withInput()->withErrors($validator);
-    }
-}
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        return redirect()->route('roles.index')->with('success', 'Role berhasil ditambahkan.');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * ✏️ Form edit role
      */
     public function edit(string $id)
     {
-        $roles = Role::findOrfail($id);
+        $roles = Role::findOrFail($id);
+        $permissions = Permission::orderBy('name', 'ASC')->get();
         $hasPermissions = $roles->permissions->pluck('name');
-        $permissions = Permission::orderBy('name','ASC')->get();
-         return view('roles.edit',[
-            'roles' => $roles,
-         'permissions' => $permissions,
-         'hasPermission' =>$hasPermissions
-         ]);
+
+        return view('roles.edit', compact('roles', 'permissions', 'hasPermissions'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * 🔄 Update data role
      */
     public function update(Request $request, string $id)
     {
-        $roles = Role::findOrfail($id);
-        $validator = Validator::make($request->all(),[
-          'name' => 'required|min:3|unique:roles,name,'. $id .',id'
+        $role = Role::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|min:3|unique:roles,name,' . $id,
         ]);
 
-        if ($validator->passes()){
-            $roles->name = $request->name;
-            $roles->save();
-        
+        if ($validator->fails()) {
+            return redirect()->route('roles.edit', $role->id)
+                ->withInput()
+                ->withErrors($validator);
+        }
 
-        if (!empty($request->permission)){
-            $roles->syncPermissions($request->input('permission',[]));
-        }
-        return redirect()->route('roles.index')->with('berhasil','berhasil update');
-        }else {
-            return redirect()->route('roles.edit')->withInput()->withErrors($validator);
-        }
+        $role->update(['name' => $request->name]);
+
+        // Ambil permission dari request, default ke array kosong jika tidak ada
+        $permissions = $request->input('permission', []);
+
+        // Selalu sync — bahkan jika kosong!
+        $role->syncPermissions($permissions);
+
+        return redirect()->route('roles.index')->with('success', 'Role berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * 🗑️ Hapus role
      */
     public function destroy(string $id)
     {
-    $roles = Role::find($id);
+        $role = Role::find($id);
 
-    if (! $roles) {
-        return redirect()
-        ->route('permissions.index')->with('eror','permission ga ada');
+        if (!$role) {
+            return redirect()->route('roles.index')->with('error', 'Role tidak ditemukan.');
+        }
 
-    }
-    $name = $roles->name;
-    $roles->delete();
+        $name = $role->name;
+        $role->delete();
 
-    return redirect()
-        ->route('roles.index',"Role'{$name}'udah dihapus");
-    
+        return redirect()->route('roles.index')->with('success', "Role '{$name}' berhasil dihapus.");
     }
 }
