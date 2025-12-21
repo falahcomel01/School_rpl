@@ -23,9 +23,14 @@ class JadwalController extends Controller
         ->when($user->hasRole('guru'), function ($q) use ($user) {
             return $q->where('guru_id', $user->guru->id);
         })
-        ->when($user->hasRole('orangtua'), function ($q) use ($user) {
+      ->when($user->hasRole('orangtua'), function ($q) use ($user) {
+    if (!$user->orangtua || !$user->orangtua->siswa) {
+        return $q->whereRaw('1 = 0'); // kosongkan jadwal
+    }
+
     return $q->where('kelas_id', $user->orangtua->siswa->kelas_id);
 })
+
 
         ->orderBy('hari')
         ->orderBy('jam_mulai')

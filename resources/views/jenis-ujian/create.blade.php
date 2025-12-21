@@ -8,12 +8,12 @@
     <form action="{{ route('jenis-ujian.store') }}" method="POST" class="form-card">
       @csrf
 
-      {{-- Jika admin/TU, tampilkan pilih guru --}}
-      @if($user->role !== 'guru')
+      {{-- Jika ADMIN / TU / SUPERADMIN --}}
+      @if(auth()->user()->guru === null)
         <div class="form-group">
           <label class="form-label">Pilih Guru</label>
 
-          <select name="guru_id" class="form-input">
+          <select name="guru_id" class="form-input" required>
             <option value="">-- pilih guru --</option>
 
             @foreach ($gurus as $guru)
@@ -29,9 +29,16 @@
         </div>
       @endif
 
+      {{-- Nama Jenis Ujian --}}
       <div class="form-group">
         <label class="form-label">Nama Jenis Ujian</label>
-        <input type="text" name="nama_jenis_ujian" value="{{ old('nama_jenis_ujian') }}" class="form-input">
+        <input
+          type="text"
+          name="nama_jenis_ujian"
+          value="{{ old('nama_jenis_ujian') }}"
+          class="form-input"
+          required
+        >
 
         @error('nama_jenis_ujian')
           <p class="text-error">{{ $message }}</p>
@@ -39,10 +46,10 @@
       </div>
 
       <button class="btn-submit">Simpan</button>
-
     </form>
 
   </div>
+
 
   {{-- CSS --}}
   <style>

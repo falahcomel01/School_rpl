@@ -299,8 +299,7 @@ Route::post('/ujian/{ujian}/atur-soal', [UjianController::class, 'storeSoal'])
     Route::get(
     '/ekstrakurikulers/{ekstrakurikuler}/peserta',
     [EkstrakurikulerController::class, 'peserta']
-)->middleware('role:superadmin')
- ->name('ekstrakurikulers.peserta');
+)->name('ekstrakurikulers.peserta');
 
   Route::resource('prestasi', PrestasiController::class);
     Route::get('prestasi/{prestasi}/download', [PrestasiController::class, 'downloadBukti'])->name('prestasi.download');

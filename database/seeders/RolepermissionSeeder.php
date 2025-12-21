@@ -14,29 +14,54 @@ class RolePermissionSeeder extends Seeder
         // 1. DAFTAR PERMISSION
         // ======================
        $permissions = [
-    'view users', 'view roles', 'view permissions',
-    'create users', 'show users', 'edit users', 'delete users',
-    'create roles', 'show roles', 'edit roles', 'delete roles',
-    'create permissions', 'show permissions', 'edit permissions', 'delete permissions',
-    'view total', 'view siswa', 'edit siswa', 'view guru',
-    'view jadwal', 'create jadwal', 'edit jadwal',
-    'edit presensisiswa', 'create presensisiswa', 'delete presensisiswa', 'view presensisiswa', 'show presensisiswa',
-    'create presensiguru', 'show presensiguru', 'view presensiguru', 'delete presensiguru',
+     'view jadwal', 'view guru jadwal', 'view kelas jadwal', 'view all jadwal',
 
-    'create walikelas', 'delete walikelas', 'edit walikelas', 'view walikelas',
+            // Presensi siswa
+            'view presensisiswa', 'show presensisiswa', 'create presensisiswa',
+            'edit presensisiswa', 'delete presensisiswa',
+            'view all presensisiswa', 'view kelas presensisiswa',
+            'view guru presensisiswa', 'view presensi siswa',
 
-    'view perizinan', 'edit perizinan', 'delete perizinan', 'create perizinan',
-    'view all perizinan', 'view siswa perizinan', 'view own perizinan',
+            // Presensi guru
+            'create presensiguru', 'view presensiguru', 'show presensiguru', 'delete presensiguru',
 
-    'view all jadwal', 'view guru jadwal', 'view kelas jadwal',
+            // Perizinan
+            'view perizinan', 'create perizinan', 'edit perizinan',
+            'delete perizinan', 'validasi izin',
+            'view all perizinan', 'view siswa perizinan', 'view own perizinan',
 
-    'view all presensisiswa', 'view kelas presensisiswa', 'view guru presensisiswa',
+            // Users & Role
+            'view users', 'create users', 'show users', 'edit users', 'delete users',
+            'view roles', 'create roles', 'show roles', 'edit roles', 'delete roles',
+            'view permissions', 'create permissions', 'show permissions',
+            'edit permissions', 'delete permissions',
 
-    'view presensi siswa',
-    'delete siswa',
+            // Akademik
+            'view siswa', 'edit siswa', 'delete siswa',
+            'view guru', 'view walikelas', 'create walikelas',
+            'edit walikelas', 'delete walikelas',
 
-    // Catatan Perkembangan
-    'view catatan_perkembangan', 'create catatan_perkembangan', 'edit catatan_perkembangan', 'delete catatan_perkembangan',
+            // Prestasi
+            'view prestasi', 'create prestasi',
+
+            // Materi & tugas
+            'view materi', 'view tugas',
+
+            // Kelulusan
+            'view aturankelulusan', 'create kelulusan', 'view daskelulusan',
+
+            // Statistik & dashboard
+            'view statistik', 'view total',
+
+            // Catatan perkembangan
+            'view catatan_perkembangan', 'create catatan_perkembangan',
+            'edit catatan_perkembangan', 'delete catatan_perkembangan',
+
+            // Ekstrakurikuler
+            'view extra', 'view peserta', 'pilihan extra',
+
+            // Perizinan typo yg kamu pakai
+            'create prizinan',
 ];
 
         foreach ($permissions as $permission) {
@@ -66,28 +91,29 @@ class RolePermissionSeeder extends Seeder
 
         // Guru
         $roleGuru->givePermissionTo([
-            'view jadwal',
-            'edit presensisiswa',
-            'create presensisiswa',
-            'view presensisiswa',
-            'show presensisiswa',
-            'view walikelas',
-            'view perizinan',
-            'create perizinan',
-            'view siswa perizinan',
-            'view guru jadwal',
-            'view presensi siswa',
+           'view jadwal',
+'view guru jadwal',
+'view presensisiswa',
+'show presensisiswa',
+'create presensisiswa',
+'edit presensisiswa',
+'view presensi siswa',
+'view perizinan',
+'create perizinan',
+'create prizinan',
+'view siswa perizinan',
+'view materi',
+'view tugas',
+
         ]);
 
         // Siswa
         $roleSiswa->givePermissionTo([
-            'view jadwal',
-            'view presensisiswa',
-            'show presensisiswa',
-            'view perizinan',
-            'create perizinan',
-            'view own perizinan',
-            'view catatan_perkembangan', // lihat catatan perkembangan sendiri
+            'view jadwal', 'view presensisiswa', 'show presensisiswa',
+            'view walikelas', 'view perizinan', 'create perizinan',
+            'view own perizinan', 'view extra', 'view prestasi',
+            'view catatan_perkembangan', 'view tugas',
+            'create prizinan', 'pilihan extra',
         ]);
 
         // 🧑‍🎓 **Orang Tua**
@@ -97,35 +123,27 @@ class RolePermissionSeeder extends Seeder
             'show presensisiswa',
             'view siswa',               // lihat data anak
             'view perizinan',           // lihat izin anak
-            'view catatan_perkembangan', // lihat catatan perkembangan anak
+            'view catatan_perkembangan','view prestasi', // lihat catatan perkembangan anak
         ]);
 
         // 👨‍🏫 **Wali Kelas**
         $roleWaliKelas->givePermissionTo([
-            'view kelas jadwal',        // hanya jadwal kelasnya
-            'view kelas presensisiswa', // hanya presensi kelasnya
-            'view siswa',               // lihat siswa kelasnya
-            'edit siswa',               // jika perlu edit
-            'view walikelas',
-            'view perizinan',
-            'view siswa perizinan',
-            // Catatan Perkembangan
-            'view catatan_perkembangan',
-            'create catatan_perkembangan',
-            'edit catatan_perkembangan',
-            'delete catatan_perkembangan',
+            'view total', 'view siswa', 'view guru', 'view walikelas',
+            'view perizinan', 'view all perizinan',
+            'view all jadwal', 'view all presensisiswa',
+            'validasi izin', 'view prestasi',
+            'view statistik', 'view daskelulusan',
         ]);
+    
 
         // 🎓 **Kepala Sekolah**
         $roleKepsek->givePermissionTo([
-            'view all presensisiswa',
-            'view all jadwal',
-            'view all perizinan',
-            'view guru',
-            'view siswa',
-            'view walikelas',
-            'view total',
-            'view catatan_perkembangan', // lihat semua catatan perkembangan
+           'view total', 'view siswa', 'view guru', 'view walikelas',
+            'view perizinan', 'view all perizinan',
+            'view all jadwal', 'view all presensisiswa',
+            'validasi izin', 'view prestasi',
+            'view statistik', 'view daskelulusan',
+        
         ]);
     }
 }

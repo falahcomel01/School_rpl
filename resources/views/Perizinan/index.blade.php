@@ -139,9 +139,10 @@
 
   <div class="p-6">
 
-    {{-- Tombol Ajukan Izin --}}
     <div class="flex justify-end mb-4">
+       @can('create prizinan')
       <a href="{{ route('perizinan.create') }}" class="btn-create">+ Ajukan Izin</a>
+      @endcan
     </div>
 
     @if (session('success'))

@@ -438,7 +438,7 @@
                                     $label = match($role) {
                                         'siswa' => 'NISN',
                                         'guru', 'kepsek', 'tus' => 'NIP',
-                                        'orangtua' => 'No HP',
+                                        'orangtua' ,'pembina' => 'No HP',
                                         default => 'Username'
                                     };
                                 @endphp
@@ -448,7 +448,7 @@
                         <div class="profile-info-value">{{ $user->username }}</div>
                     </div>
 
-                    @if (in_array($role, ['superadmin','siswa', 'guru', 'orangtua', 'tus', 'kepsek']))
+                    @if (in_array($role, ['superadmin','siswa', 'guru', 'orangtua', 'tus', 'kepsek','pembina']))
                         <div class="profile-info-item">
                             <div class="profile-info-label">
                                 <i class="fas fa-map-marker-alt"></i>
@@ -824,7 +824,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             const usernameInput = document.querySelector('input[name="username"]');
             const role = "{{ $role }}";
-            const numericRoles = ['siswa', 'guru', 'kepsek', 'tus', 'orangtua'];
+            const numericRoles = ['siswa', 'guru', 'kepsek', 'tus', 'orangtua','pembina'];
 
             if (usernameInput && numericRoles.includes(role)) {
                 // Only allow numbers
@@ -863,7 +863,7 @@
                         const minLength = ['guru', 'kepsek', 'tu'].includes(role) ? 18 : 10;
                         if (value.length < minLength) {
                             e.preventDefault();
-                            let label = role === 'siswa' ? 'NISN' : (role === 'orangtua' ? 'Nomor HP' : 'NIP');
+                            let label = role === 'siswa' ? 'NISN' : (role === 'orangtua' ,'pembina' ? 'Nomor HP' : 'NIP');
                             alert(`${label} minimal ${minLength} digit!`);
                             usernameInput.focus();
                             return false;

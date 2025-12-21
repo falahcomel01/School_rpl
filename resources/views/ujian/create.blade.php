@@ -17,7 +17,7 @@
                     <select name="kelas_id" class="form-select @error('kelas_id') is-invalid @enderror" required>
                         <option value="">-- Pilih Kelas yang Anda Ampu --</option>
                         @foreach ($kelas as $k)
-                            <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                            <option value="{{ $k->id }}">{{ $k->nama_kelas }}-{{ $k->jurusan->nama_jurusan }}</option>
                         @endforeach
                     </select>
                     @error('kelas_id') <small class="text-danger">{{ $message }}</small> @enderror

@@ -9,13 +9,29 @@ use Carbon\Carbon;
 
 class EkstrakurikulerController extends Controller
 {
-  public function index()
+ public function index()
 {
-    $ekstrakurikulers = Ekstrakurikuler::with('pembina.user')
-        ->withCount('peserta')  // TAMBAHKAN INI
-        ->paginate(10);
+    $user = auth()->user();
+
+    $query = Ekstrakurikuler::with('pembina.user')
+        ->withCount('peserta');
+
+    // 🔒 JIKA PEMBINA → HANYA LIHAT EKSTRA SENDIRI
+    if ($user->hasRole('pembina')) {
+
+        if (!$user->pembina) {
+            abort(403, 'Data pembina tidak ditemukan');
+        }
+
+        $query->where('pembina_id', $user->pembina->id);
+    }
+
+    // ADMIN → otomatis lihat semua
+    $ekstrakurikulers = $query->paginate(10);
+
     return view('ekstrakurikulers.index', compact('ekstrakurikulers'));
 }
+
 
     public function create()
     {

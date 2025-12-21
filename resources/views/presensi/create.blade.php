@@ -104,23 +104,57 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($siswas as $index => $siswa)
-                                    @php
-                                        $selected = old("status_siswa.{$siswa->user->id}", $siswa->status_default);
-                                    @endphp
-                                    <tr>
-                                        <td style="text-align:center;">{{ $index + 1 }}</td>
-                                        <td>{{ $siswa->user->name }}</td>
-                                        <td>
-                                            <select name="status_siswa[{{ $siswa->user->id }}]">
-                                                <option value="hadir" {{ $selected == 'hadir' ? 'selected' : '' }}>Hadir</option>
-                                                <option value="izin"  {{ $selected == 'izin'  ? 'selected' : '' }}>Izin</option>
-                                                <option value="sakit" {{ $selected == 'sakit' ? 'selected' : '' }}>Sakit</option>
-                                                <option value="alpa"  {{ $selected == 'alpa'  ? 'selected' : '' }}>Alpa</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                @endforeach
+                              @foreach($siswas as $index => $siswa)
+    @php
+        $izin = $perizinan[$siswa->user->id] ?? null;
+
+        // status final
+        $selected = $izin
+            ? $izin->status
+            : old("status_siswa.{$siswa->user->id}", $siswa->status_default);
+    @endphp
+
+    <tr>
+        <td style="text-align:center;">{{ $index + 1 }}</td>
+        <td>
+            {{ $siswa->user->name }}
+
+            @if($izin)
+                <span style="
+                    background:#fee2e2;
+                    color:#7f1d1d;
+                    padding:2px 6px;
+                    border-radius:6px;
+                    font-size:11px;
+                    margin-left:6px;
+                ">
+                    {{ strtoupper($izin->status) }}
+                </span>
+            @endif
+        </td>
+        <td>
+            <select
+                name="status_siswa[{{ $siswa->user->id }}]"
+                {{ $izin ? 'disabled' : '' }}
+            >
+                <option value="hadir" {{ $selected == 'hadir' ? 'selected' : '' }}>Hadir</option>
+                <option value="izin"  {{ $selected == 'izin'  ? 'selected' : '' }}>Izin</option>
+                <option value="sakit" {{ $selected == 'sakit' ? 'selected' : '' }}>Sakit</option>
+                <option value="alpa"  {{ $selected == 'alpa'  ? 'selected' : '' }}>Alpa</option>
+            </select>
+
+            {{-- supaya tetap terkirim --}}
+            @if($izin)
+                <input
+                    type="hidden"
+                    name="status_siswa[{{ $siswa->user->id }}]"
+                    value="{{ $izin->status }}"
+                >
+            @endif
+        </td>
+    </tr>
+@endforeach
+
                             </tbody>
                         </table>
                     </div>

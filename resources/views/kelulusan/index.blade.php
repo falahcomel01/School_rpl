@@ -164,14 +164,15 @@
         {{-- HEADER --}}
         <div class="flex justify-between items-center mb-3">
           <h3 class="header-title">Data Kelulusan Siswa</h3>
-
           <div style="display: flex; gap: 10px;">
+            @can('view daskelulusan')
             <a href="{{ route('kelulusan.dashboard') }}" class="btn-add" style="background-color: #3b82f6;">
-              📊 Dashboard Kelulusan
-            </a>
+              Dashboard Kelulusan
+            </a> @endcan
+            @can('create kelulusan')
             <a href="{{ route('kelulusan.create') }}" class="btn-add">
               + Tambah Kelulusan
-            </a>
+            </a> @endcan
           </div>
         </div>
 
@@ -223,8 +224,8 @@
               <label>Tahun Lulus</label>
               <input type="number" name="tahun_lulus" placeholder="Contoh: 2025" required>
             </div>
-
-            <button class="btn-add">⚡ Auto Generate</button>
+ @can('create kelulusan')
+            <button class="btn-add"> Auto Generate</button>@endcan
           </div>
         </form>
 
@@ -281,11 +282,10 @@
       Detail
     </a>
 
-    {{-- EDIT --}}
+  @can('create kelulusan')
     <a href="{{ route('kelulusan.edit', $item->id) }}" class="btn btn-edit">
       Edit
     </a>
-
     {{-- HAPUS --}}
     <form action="{{ route('kelulusan.destroy', $item->id) }}"
           method="POST"
@@ -296,7 +296,7 @@
         Hapus
       </button>
     </form>
-
+    @endcan
   </div>
 </td>
                 </tr>

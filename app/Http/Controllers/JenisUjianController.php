@@ -10,179 +10,192 @@ use Illuminate\Support\Facades\Auth;
 class JenisUjianController extends Controller
 {
     /**
-     * List Jenis Ujian
-     * Guru → hanya Jenis Ujian miliknya
-     * Admin / TU → semua Jenis Ujian
+     * =========================
+     * LIST JENIS UJIAN
+     * =========================
      */
     public function index()
     {
         $user = Auth::user();
 
-        if ($user->role === 'guru') {
-            // Guru hanya lihat Jenis Ujian miliknya
-            $guru = $user->guru;
-
+        // GURU → hanya lihat miliknya
+        if ($user->guru) {
             $jenisUjians = JenisUjian::with('guru.mapel')
-                ->where('guru_id', $guru->id)
+                ->where('guru_id', $user->guru->id)
                 ->get();
-        } else {
-            // Admin / TU dapat lihat semua jenis ujian
+        }
+        // TU / SUPERADMIN → lihat semua
+        else {
             $jenisUjians = JenisUjian::with('guru.mapel')->get();
         }
 
-        return view('jenis-ujian.index', compact('jenisUjians', 'user'));
+        return view('jenis-ujian.index', compact('jenisUjians'));
     }
 
     /**
-     * Form tambah Jenis Ujian
+     * =========================
+     * FORM TAMBAH
+     * =========================
      */
     public function create()
     {
         $user = Auth::user();
 
-        if ($user->role === 'guru') {
-            // guru tidak pilih guru lain
+        // GURU → tidak boleh pilih guru
+        if ($user->guru) {
             $gurus = null;
-        } else {
-            // admin & TU bisa pilih guru
+        }
+        // TU / SUPERADMIN → bisa pilih guru
+        else {
             $gurus = Guru::with('user', 'mapel')->get();
         }
 
-        return view('jenis-ujian.create', compact('gurus', 'user'));
+        return view('jenis-ujian.create', compact('gurus'));
     }
 
     /**
-     * Simpan Jenis Ujian
+     * =========================
+     * SIMPAN
+     * =========================
      */
     public function store(Request $request)
     {
         $user = Auth::user();
 
-        // Jika guru → guru_id otomatis
-        if ($user->role === 'guru') {
+        // =========================
+        // GURU
+        // =========================
+        if ($user->guru) {
             $request->validate([
                 'nama_jenis_ujian' => 'required|string|max:255',
             ]);
 
             $guru_id = $user->guru->id;
-        } else {
-            // admin & TU harus memilih guru
+        }
+        // =========================
+        // TU / SUPERADMIN
+        // =========================
+        else {
             $request->validate([
-                'guru_id'  => 'required|exists:gurus,id',
+                'guru_id' => 'required|exists:gurus,id',
                 'nama_jenis_ujian' => 'required|string|max:255',
             ]);
 
             $guru_id = $request->guru_id;
         }
 
-        // ⛔ Cek duplikasi Jenis Ujian untuk guru tersebut
-        $cek = JenisUjian::where('guru_id', $guru_id)
+        // Cegah duplikasi
+        $exists = JenisUjian::where('guru_id', $guru_id)
             ->where('nama_jenis_ujian', $request->nama_jenis_ujian)
             ->exists();
 
-        if ($cek) {
+        if ($exists) {
             return back()->withErrors([
-                'nama_jenis_ujian' => 'Jenis Ujian ini sudah ada untuk guru tersebut!'
+                'nama_jenis_ujian' => 'Jenis ujian sudah ada untuk guru ini'
             ])->withInput();
         }
 
-        // Simpan
         JenisUjian::create([
-            'guru_id'  => $guru_id,
+            'guru_id' => $guru_id,
             'nama_jenis_ujian' => $request->nama_jenis_ujian,
         ]);
 
         return redirect()->route('jenis-ujian.index')
-            ->with('success', 'Jenis Ujian berhasil dibuat!');
+            ->with('success', 'Jenis ujian berhasil dibuat');
     }
 
     /**
-     * Edit Jenis Ujian
+     * =========================
+     * FORM EDIT
+     * =========================
      */
     public function edit(JenisUjian $jenisUjian)
     {
         $user = Auth::user();
 
-        // Guru hanya bisa edit jenis ujian miliknya sendiri
-        if ($user->role === 'guru' && $jenisUjian->guru_id !== $user->guru->id) {
+        // Guru hanya boleh edit miliknya
+        if ($user->guru && $jenisUjian->guru_id !== $user->guru->id) {
             abort(403);
         }
 
-        $gurus = null;
+        $gurus = $user->guru
+            ? null
+            : Guru::with('user', 'mapel')->get();
 
-        // Admin & TU bisa ganti guru Jenis Ujian
-        if ($user->role !== 'guru') {
-            $gurus = Guru::with('user', 'mapel')->get();
-        }
-
-        return view('jenis-ujian.edit', compact('jenisUjian', 'gurus', 'user'));
+        return view('jenis-ujian.edit', compact('jenisUjian', 'gurus'));
     }
 
     /**
-     * Update Jenis Ujian
+     * =========================
+     * UPDATE
+     * =========================
      */
     public function update(Request $request, JenisUjian $jenisUjian)
     {
         $user = Auth::user();
 
-        if ($user->role === 'guru') {
+        // =========================
+        // GURU
+        // =========================
+        if ($user->guru) {
+            abort_if($jenisUjian->guru_id !== $user->guru->id, 403);
+
             $request->validate([
                 'nama_jenis_ujian' => 'required|string|max:255',
             ]);
 
-            // Guru tidak boleh pindahkan jenis ujian ke guru lain
-            if ($jenisUjian->guru_id !== $user->guru->id) {
-                abort(403);
-            }
-
             $guru_id = $user->guru->id;
-
-        } else {
-            // Admin / TU bisa pindahkan jenis ujian ke guru lain
+        }
+        // =========================
+        // TU / SUPERADMIN
+        // =========================
+        else {
             $request->validate([
+                'guru_id' => 'required|exists:gurus,id',
                 'nama_jenis_ujian' => 'required|string|max:255',
-                'guru_id'  => 'required|exists:gurus,id',
             ]);
 
             $guru_id = $request->guru_id;
         }
 
-        // ⛔ Cek duplikasi kecuali jenis ujian yang sedang diupdate
-        $cek = JenisUjian::where('guru_id', $guru_id)
+        // Cegah duplikasi
+        $exists = JenisUjian::where('guru_id', $guru_id)
             ->where('nama_jenis_ujian', $request->nama_jenis_ujian)
             ->where('id', '!=', $jenisUjian->id)
             ->exists();
 
-        if ($cek) {
+        if ($exists) {
             return back()->withErrors([
-                'nama_jenis_ujian' => 'Jenis Ujian ini sudah ada untuk guru tersebut!'
+                'nama_jenis_ujian' => 'Jenis ujian sudah ada untuk guru ini'
             ])->withInput();
         }
 
-        // Update
         $jenisUjian->update([
-            'guru_id'  => $guru_id,
+            'guru_id' => $guru_id,
             'nama_jenis_ujian' => $request->nama_jenis_ujian,
         ]);
 
         return redirect()->route('jenis-ujian.index')
-            ->with('success', 'Jenis Ujian berhasil diperbarui!');
+            ->with('success', 'Jenis ujian berhasil diperbarui');
     }
 
     /**
-     * Hapus Jenis Ujian
+     * =========================
+     * HAPUS
+     * =========================
      */
     public function destroy(JenisUjian $jenisUjian)
     {
         $user = Auth::user();
 
-        if ($user->role === 'guru' && $jenisUjian->guru_id !== $user->guru->id) {
+        // Guru hanya boleh hapus miliknya
+        if ($user->guru && $jenisUjian->guru_id !== $user->guru->id) {
             abort(403);
         }
 
         $jenisUjian->delete();
 
         return redirect()->route('jenis-ujian.index')
-            ->with('success', 'Jenis Ujian berhasil dihapus!');
+            ->with('success', 'Jenis ujian berhasil dihapus');
     }
 }

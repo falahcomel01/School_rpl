@@ -28,6 +28,7 @@
           <tr>
             <th class="text-center">No</th>
             <th class="text-center">Kelas</th>
+            <th class="text-center">Jurusan</th>
             <th class="text-center">Mapel</th>
             <th class="text-center">Semester</th>
             <th class="text-center">Tahun Ajaran</th>
@@ -44,6 +45,7 @@
             <tr>
               <td class="text-center">{{ $loop->iteration }}</td>
               <td>{{ $p->kelas->nama_kelas }}</td>
+               <td>{{ $p->kelas->jurusan->nama_jurusan }}</td>
               <td>{{ $p->mapel->nama_mapel }}</td>
               <td class="text-center">{{ $p->semester }}</td>
               <td class="text-center">{{ $p->tahun_ajaran }}</td>

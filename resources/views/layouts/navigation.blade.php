@@ -161,12 +161,12 @@
                 <span class="link-text">Tugas Online</span>
             </a>
             @endcan
-            <!-- Catatan Perkembangan -->
+            @can('view catatan_perkembangan')
             <a href="{{ route('catatan_perkembangan.index') }}" class="nav-link {{ request()->routeIs('catatan_perkembangan.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-book-bookmark"></i>
                 <span class="link-text">Catatan Perkembangan</span>
             </a>
-
+@endcan
             <!-- Materi Pembelajaran -->
             @canany('view materi')
             <div class="nav-item-elite-red-dropdown {{ request()->routeIs('jenis-ujian.*','soal.*','ujian.*') ? 'active' : '' }}">
@@ -205,6 +205,12 @@
                 <span class="link-text">Rekap Nilai</span>
             </a>
             @endif
+              @if(Auth::user()->siswa)
+            <a href="{{ route('rekap_nilai.siswa') }}" class="nav-link {{ request()->routeIs('rekap_nilai.siswa') ? 'active' : '' }}">
+                <i class="fa-solid fa-file-alt"></i>
+                <span class="link-text">Rekap Nilai Saya</span>
+            </a>
+            @endif
 
           <!-- Rapor Saya (SISWA & ORANG TUA) -->
 @if(
@@ -222,18 +228,10 @@
 
 
             <!-- Rapor (Untuk Guru & Superadmin) -->
-            @if(Auth::user()->guru || Auth::user()->roles->contains('name', 'superadmin'))
+            @if(Auth::user()->walikelas || Auth::user()->roles->contains('name', 'superadmin'))
             <a href="{{ route('rapor.index') }}" class="nav-link {{ request()->routeIs('rapor.index', 'rapor.create', 'rapor.show') ? 'active' : '' }}">
                 <i class="fa-solid fa-file-pdf"></i>
                 <span class="link-text">Rapor</span>
-            </a>
-            @endif
-
-            <!-- Rapor Saya (Untuk Siswa) -->
-            @if(Auth::user()->siswa)
-            <a href="{{ route('rapor.siswa') }}" class="nav-link {{ request()->routeIs('rapor.siswa') ? 'active' : '' }}">
-                <i class="fa-solid fa-graduation-cap"></i>
-                <span class="link-text">Rapor Saya</span>
             </a>
             @endif
           @can('view extra')
@@ -246,10 +244,11 @@
                 <span class="link-text">Presensi Ekstra</span>
             </a>
             @endcan
+            @can('view prestasi')
             <a href="{{ route('prestasi.index') }}" class="nav-link {{ request()->routeIs('prestasi.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-trophy"></i>
                 <span class="link-text">Prestasi</span>
-            </a>
+            </a> @endcan
              @can('view aturankelulusan')
             <a href="{{ route('aturan-kelulusan.index') }}" class="nav-link {{ request()->routeIs('aturan-kelulusan.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-file-contract"></i>

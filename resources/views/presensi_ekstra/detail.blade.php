@@ -114,11 +114,6 @@
                             $allowEdit = now()->diffInHours($firstPresensi->created_at) <= 24;
                         }
                     @endphp
-                    @if($allowEdit)
-                        <a href="{{ route('presensi_ekstra.edit', ['ekstrakurikuler_id' => $ekstra->id, 'tanggal' => $tanggal]) }}" class="btn-edit">
-                            <i class="fas fa-edit"></i> Edit Presensi
-                        </a>
-                    @endif
                 </div>
             </div>
 

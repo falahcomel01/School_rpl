@@ -9,6 +9,7 @@ use App\Models\Tu;
 use App\Models\Orangtua;
 use App\Models\Kepsek;
 use App\Models\Superadmin;
+use App\Models\Pembina;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -24,6 +25,7 @@ class ProfileController extends Controller
             'tus' => Tu::class,
             'orangtua' => Orangtua::class,
             'superadmin' => Superadmin::class,
+            'pembina' => Pembina::class,
         ][$role] ?? null;
     }
 
@@ -35,6 +37,7 @@ class ProfileController extends Controller
             'kepsek' => 'NIP',
             'tus' => 'NIP',
             'orangtua' => 'No HP',
+            'pembina' => 'No HP',
             'superadmin' => 'Username',
         ][$role] ?? 'Username';
     }
@@ -74,7 +77,7 @@ class ProfileController extends Controller
 
         $isSuperAdmin = ($role === 'superadmin');
         if ($isSuperAdmin) {
-            if (in_array($role, ['siswa', 'guru', 'kepsek', 'tus', 'orangtua'])) {
+            if (in_array($role, ['siswa', 'guru', 'kepsek', 'tus', 'orangtua','pembina'])) {
                 $rules['username'] = ['required', 'numeric', 'digits_between:10,18', 'unique:users,username,' . $user->id];
             } else {
                 $rules['username'] = ['required', 'string', 'max:255', 'unique:users,username,' . $user->id];
