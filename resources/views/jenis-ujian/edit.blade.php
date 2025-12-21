@@ -11,12 +11,13 @@
       @method('PUT')
 
       {{-- Admin & TU bisa ganti guru --}}
-      @if($user->role !== 'guru')
+      @if(auth()->user()->hasAnyRole(['superadmin', 'tus']))
         <div class="form-group">
           <label class="form-label">Pilih Guru</label>
           <select name="guru_id" class="form-input">
             @foreach ($gurus as $guru)
-              <option value="{{ $guru->id }}" {{ $jenisUjian->guru_id == $guru->id ? 'selected' : '' }}>
+              <option value="{{ $guru->id }}"
+                {{ $jenisUjian->guru_id == $guru->id ? 'selected' : '' }}>
                 {{ $guru->user->name }} — {{ $guru->mapel->nama_mapel ?? '-' }}
               </option>
             @endforeach
@@ -30,15 +31,21 @@
 
       <div class="form-group">
         <label class="form-label">Nama Jenis Ujian</label>
-        <input type="text" name="nama_jenis_ujian" class="form-input"
-               value="{{ old('nama_jenis_ujian', $jenisUjian->nama_jenis_ujian) }}">
+        <input
+          type="text"
+          name="nama_jenis_ujian"
+          class="form-input"
+          value="{{ old('nama_jenis_ujian', $jenisUjian->nama_jenis_ujian) }}"
+        >
 
         @error('nama_jenis_ujian')
           <p class="text-error">{{ $message }}</p>
         @enderror
       </div>
 
-      <button class="btn-submit">Update</button>
+      <button type="submit" class="btn-submit">
+        Update
+      </button>
     </form>
 
   </div>
@@ -58,16 +65,6 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
       border: 1px solid #f1dada;
       padding: 30px;
-    }
-
-    .page-title {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #b91c1c;
-      border-bottom: 3px solid #b91c1c;
-      display: inline-block;
-      padding-bottom: 6px;
-      margin-bottom: 25px;
     }
 
     .top-section {
@@ -144,7 +141,6 @@
     .btn-submit:hover {
       background-color: #991b1b;
     }
-
   </style>
 
 </x-app-layout>
