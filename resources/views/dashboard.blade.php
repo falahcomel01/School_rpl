@@ -1238,92 +1238,266 @@
   </script>
   @endif
 
-  @if(session('active_role') === 'kepsek' && isset($kelulusanData))
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script>
-    const kColors = {
-      green: '#10b981',
-      red: '#ef4444',
-      blue: '#3b82f6'
-    };
+  {{-- CHART.JS SCRIPTS UNTUK KEPSEK - IMPROVED --}}
+@if(session('active_role') === 'kepsek' && isset($kelulusanData))
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Debug: Log data
+  console.log('=== KELULUSAN CHART DATA ===');
+  console.log('Tahun Labels:', @json($kelulusanData['tahunLabels']));
+  console.log('Tahun Data Lulus:', @json($kelulusanData['tahunDataLulus']));
+  console.log('Jurusan Labels:', @json($kelulusanData['jurusanLabels']));
+  console.log('Jurusan Data Lulus:', @json($kelulusanData['jurusanDataLulus']));
+  
+  const kColors = {
+    green: '#10b981',
+    red: '#ef4444',
+    blue: '#3b82f6'
+  };
 
-    // Status Chart
-    new Chart(document.getElementById('statusChart'), {
-      type: 'pie',
-      data: {
-        labels: @json($kelulusanData['statusLabels']),
-        datasets: [{
-          data: @json($kelulusanData['statusData']),
-          backgroundColor: [kColors.green, kColors.red],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' } }
-      }
-    });
-
-    // Tren Chart
-    new Chart(document.getElementById('trenTahunChart'), {
-      type: 'line',
-      data: {
-        labels: @json($kelulusanData['tahunLabels']),
-        datasets: [
-          {
-            label: 'Lulus',
-            data: @json($kelulusanData['tahunDataLulus']),
-            borderColor: kColors.green,
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            tension: 0.4,
-            fill: true
-          },
-          {
-            label: 'Tidak Lulus',
-            data: @json($kelulusanData['tahunDataTidakLulus']),
-            borderColor: kColors.red,
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            tension: 0.4,
-            fill: true
+  // 1. Status Chart (Pie)
+  const statusCanvas = document.getElementById('statusChart');
+  if (statusCanvas) {
+    const statusData = @json($kelulusanData['statusData']);
+    
+    if (statusData && statusData.length > 0 && statusData.some(val => val > 0)) {
+      new Chart(statusCanvas, {
+        type: 'pie',
+        data: {
+          labels: @json($kelulusanData['statusLabels']),
+          datasets: [{
+            data: statusData,
+            backgroundColor: [kColors.green, kColors.red],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                  return label + ': ' + value + ' (' + percentage + '%)';
+                }
+              }
+            }
           }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' } },
-        scales: { y: { beginAtZero: true } }
-      }
-    });
+        }
+      });
+    } else {
+      statusCanvas.parentElement.innerHTML = '<div class="empty-state"><i class="fa-solid fa-chart-pie"></i><p>Belum ada data kelulusan</p></div>';
+    }
+  }
 
-    // Jurusan Chart
-    new Chart(document.getElementById('jurusanChart'), {
-      type: 'bar',
-      data: {
-        labels: @json($kelulusanData['jurusanLabels']),
-        datasets: [
-          {
-            label: 'Lulus',
-            data: @json($kelulusanData['jurusanDataLulus']),
-            backgroundColor: kColors.green
+  // 2. Tren Tahun Chart (Line)
+  const trenCanvas = document.getElementById('trenTahunChart');
+  if (trenCanvas) {
+    const tahunLabels = @json($kelulusanData['tahunLabels']);
+    const tahunDataLulus = @json($kelulusanData['tahunDataLulus']);
+    const tahunDataTidakLulus = @json($kelulusanData['tahunDataTidakLulus']);
+    
+    if (tahunLabels && tahunLabels.length > 0) {
+      new Chart(trenCanvas, {
+        type: 'line',
+        data: {
+          labels: tahunLabels,
+          datasets: [
+            {
+              label: 'Lulus',
+              data: tahunDataLulus,
+              borderColor: kColors.green,
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              tension: 0.4,
+              fill: true,
+              borderWidth: 3,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            },
+            {
+              label: 'Tidak Lulus',
+              data: tahunDataTidakLulus,
+              borderColor: kColors.red,
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              tension: 0.4,
+              fill: true,
+              borderWidth: 3,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 15
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 12,
+              titleFont: {
+                size: 14,
+                weight: 'bold'
+              },
+              bodyFont: {
+                size: 13
+              }
+            }
           },
-          {
-            label: 'Tidak Lulus',
-            data: @json($kelulusanData['jurusanDataTidakLulus']),
-            backgroundColor: kColors.red
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          interaction: {
+            mode: 'nearest',
+            axis: 'x',
+            intersect: false
           }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' } },
-        scales: { y: { beginAtZero: true } }
-      }
-    });
-  </script>
-  @endif
+        }
+      });
+    } else {
+      trenCanvas.parentElement.innerHTML = '<div class="empty-state"><i class="fa-solid fa-chart-line"></i><p>Belum ada data per tahun</p></div>';
+    }
+  }
+
+  // 3. Jurusan Chart (Bar)
+  const jurusanCanvas = document.getElementById('jurusanChart');
+  if (jurusanCanvas) {
+    const jurusanLabels = @json($kelulusanData['jurusanLabels']);
+    const jurusanDataLulus = @json($kelulusanData['jurusanDataLulus']);
+    const jurusanDataTidakLulus = @json($kelulusanData['jurusanDataTidakLulus']);
+    
+    if (jurusanLabels && jurusanLabels.length > 0) {
+      new Chart(jurusanCanvas, {
+        type: 'bar',
+        data: {
+          labels: jurusanLabels,
+          datasets: [
+            {
+              label: 'Lulus',
+              data: jurusanDataLulus,
+              backgroundColor: kColors.green,
+              borderRadius: 6,
+              borderWidth: 2,
+              borderColor: 'rgba(16, 185, 129, 0.5)'
+            },
+            {
+              label: 'Tidak Lulus',
+              data: jurusanDataTidakLulus,
+              backgroundColor: kColors.red,
+              borderRadius: 6,
+              borderWidth: 2,
+              borderColor: 'rgba(239, 68, 68, 0.5)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 15
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 12,
+              titleFont: {
+                size: 14,
+                weight: 'bold'
+              },
+              bodyFont: {
+                size: 13
+              },
+              callbacks: {
+                afterLabel: function(context) {
+                  const datasetIndex = context.datasetIndex;
+                  const dataIndex = context.dataIndex;
+                  const lulus = jurusanDataLulus[dataIndex];
+                  const tidakLulus = jurusanDataTidakLulus[dataIndex];
+                  const total = lulus + tidakLulus;
+                  const percentage = total > 0 ? ((lulus / total) * 100).toFixed(1) : 0;
+                  return 'Tingkat Kelulusan: ' + percentage + '%';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    } else {
+      jurusanCanvas.parentElement.innerHTML = '<div class="empty-state"><i class="fa-solid fa-chart-bar"></i><p>Belum ada data per jurusan</p></div>';
+    }
+  }
+  
+  console.log('=== CHART RENDERING COMPLETE ===');
+});
+</script>
+
+<style>
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #9ca3af;
+}
+
+.empty-state i {
+  font-size: 48px;
+  margin-bottom: 10px;
+  display: block;
+  opacity: 0.3;
+}
+
+.empty-state p {
+  font-size: 14px;
+  margin: 0;
+}
+</style>
+@endif
 
 </x-app-layout>

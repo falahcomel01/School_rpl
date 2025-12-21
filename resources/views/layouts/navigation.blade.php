@@ -257,67 +257,109 @@
 @endcan
         
 @php
+    use Illuminate\Support\Facades\Auth;
+
+    $user = Auth::user();
+
+    /*
+    |--------------------------------------------------------------------------
+    | MENU KELULUSAN
+    |--------------------------------------------------------------------------
+    | - Siswa kelas 12
+    | - TU, Kepsek, Superadmin
+    */
     $canViewKelulusan = false;
-    
-    if(Auth::user()->siswa) {
-        $kelas = Auth::user()->siswa->kelas;
-        if($kelas && $kelas->nama_kelas == '12') {
+
+    if ($user->siswa && $user->siswa->kelas) {
+        $namaKelasSiswa = $user->siswa->kelas->nama_kelas;
+
+        if (
+            str_contains($namaKelasSiswa, '12') ||
+            preg_match('/\bXII\b/i', $namaKelasSiswa)
+        ) {
             $canViewKelulusan = true;
         }
     }
-    
-    // TU dan Kepsek bisa lihat (melalui role atau permission)
-    if(Auth::user()->hasAnyRole(['tus', 'kepsek', 'superadmin'])) {
+
+    if ($user->hasAnyRole(['tus', 'kepsek', 'superadmin'])) {
         $canViewKelulusan = true;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | MENU REKOMENDASI JURUSAN
+    |--------------------------------------------------------------------------
+    | - SISWA kelas 10 SAJA
+    */
+    $canViewRekomendasi = false;
+
+    if ($user->siswa && $user->siswa->kelas) {
+        $namaKelasSiswa = $user->siswa->kelas->nama_kelas;
+
+        if (
+            str_contains($namaKelasSiswa, '10') ||
+            preg_match('/\bX\b/i', $namaKelasSiswa)
+        ) {
+            $canViewRekomendasi = true;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | MENU VALIDASI REKOMENDASI
+    |--------------------------------------------------------------------------
+    | - WALI KELAS kelas 10 SAJA
+    */
+    $canViewValidasiJurusan = false;
+
+    if ($user->walikelas && $user->walikelas->kelas) {
+        $namaKelasWali = $user->walikelas->kelas->nama_kelas;
+
+        if (
+            str_contains($namaKelasWali, '10') ||
+            preg_match('/\bX\b/i', $namaKelasWali)
+        ) {
+            $canViewValidasiJurusan = true;
+        }
+    }
 @endphp
-@if($canViewKelulusan)
-<a href="{{ route('kelulusan.index') }}" class="nav-link {{ request()->routeIs('kelulusan.*') ? 'active' : '' }}">
-    <i class="fa-solid fa-graduation-cap"></i>
-    <span class="link-text">Kelulusan</span>
+
+{{-- ===================== --}}
+{{-- VALIDASI REKOMENDASI --}}
+{{-- (WALI KELAS 10 SAJA) --}}
+{{-- ===================== --}}
+@if($canViewValidasiJurusan)
+<a href="{{ route('rekomendasi.daftar') }}"
+   class="nav-link {{ request()->routeIs('rekomendasi.daftar') ? 'active' : '' }}">
+    <i class="fa-solid fa-clipboard-check"></i>
+    <span class="link-text">Validasi Rekomendasi</span>
 </a>
 @endif
 
-<!-- Menu Dinamis Berdasarkan Kelas -->
-@if(Auth::user()->siswa)
-    @php
-        $siswaData = Auth::user()->siswa;
-        if (!$siswaData->relationLoaded('kelas')) {
-            $siswaData->load('kelas');
-        }
-        
-        $kelas = $siswaData->kelas;
-        $namaKelas = $kelas ? $kelas->nama_kelas : '';
-        
-        // Deteksi kelas 10 (untuk menu Rekomendasi Jurusan)
-        $isKelas10 = !empty($namaKelas) && (
-            str_contains($namaKelas, '10') || 
-            preg_match('/\bX\b/i', $namaKelas)
-        );
-        
-        // Deteksi kelas 12 (untuk menu Info Kelulusan)
-        $isKelas12 = !empty($namaKelas) && (
-            str_contains($namaKelas, '12') || 
-            preg_match('/\bXII\b/i', $namaKelas)
-        );
-    @endphp
-    
-    <!-- Menu Rekomendasi Jurusan (Hanya Kelas 10) -->
-    @if($isKelas10)
-    <a href="{{ route('rekomendasi.index') }}" class="nav-link {{ request()->routeIs('rekomendasi.*') ? 'active' : '' }}">
-        <i class="fa-solid fa-route"></i>
-        <span>Rekomendasi Jurusan</span>
-    </a>
-    @endif
-    
-    <!-- Menu Info Kelulusan (Hanya Kelas 12) -->
-    @if($isKelas12)
-    <a href="{{ route('kelulusan.index') }}" class="nav-link {{ request()->routeIs('kelulusan.*') ? 'active' : '' }}">
-        <i class="fa-solid fa-graduation-cap"></i>
-        <span>Info Kelulusan</span>
-    </a>
-    @endif
+{{-- ===================== --}}
+{{-- REKOMENDASI JURUSAN --}}
+{{-- (SISWA KELAS 10) --}}
+{{-- ===================== --}}
+@if($canViewRekomendasi)
+<a href="{{ route('rekomendasi.index') }}"
+   class="nav-link {{ request()->routeIs('rekomendasi.*') ? 'active' : '' }}">
+    <i class="fa-solid fa-route"></i>
+    <span>Pengajuan Jurusan</span>
+</a>
 @endif
+
+{{-- ===================== --}}
+{{-- KELULUSAN --}}
+{{-- ===================== --}}
+@if($canViewKelulusan)
+<a href="{{ route('kelulusan.index') }}"
+   class="nav-link {{ request()->routeIs('kelulusan.*') ? 'active' : '' }}">
+    <i class="fa-solid fa-graduation-cap"></i>
+    <span>Kelulusan</span>
+</a>
+@endif
+
+
         </div>
     </aside>
 

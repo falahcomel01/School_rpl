@@ -7,6 +7,7 @@ use App\Models\Kelulusan;
 use App\Models\Jadwal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
@@ -161,91 +162,127 @@ class DashboardController extends Controller
 
     /**
      * Get data kelulusan untuk grafik Kepsek
+     * FIXED: Better data handling and null safety
      */
     protected function getKelulusanData()
     {
-        // Statistik Total
-        $totalLulus = Kelulusan::where('status', 'lulus')->count();
-        $totalTidakLulus = Kelulusan::where('status', 'tidak_lulus')->count();
-        $totalKeseluruhan = $totalLulus + $totalTidakLulus;
-        
-        $persentaseLulus = $totalKeseluruhan > 0 
-            ? round(($totalLulus / $totalKeseluruhan) * 100, 2) 
-            : 0;
-
-        // Statistik per Tahun (5 tahun terakhir)
-        $statsPerTahun = Kelulusan::select(
-                'tahun_lulus',
-                DB::raw('COUNT(*) as total'),
-                DB::raw('SUM(CASE WHEN status = "lulus" THEN 1 ELSE 0 END) as lulus'),
-                DB::raw('SUM(CASE WHEN status = "tidak_lulus" THEN 1 ELSE 0 END) as tidak_lulus'),
-                DB::raw('ROUND((SUM(CASE WHEN status = "lulus" THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) as persentase_lulus')
-            )
-            ->groupBy('tahun_lulus')
-            ->orderBy('tahun_lulus', 'desc')
-            ->limit(5)
-            ->get();
-
-        // Statistik per Jurusan
-        $statsPerJurusan = DB::table('kelulusans')
-            ->select(
-                DB::raw('COALESCE(jurusans.nama_jurusan, kelulusans.jurusan_legacy) as jurusan'),
-                DB::raw('COUNT(*) as total'),
-                DB::raw('SUM(CASE WHEN kelulusans.status = "lulus" THEN 1 ELSE 0 END) as lulus'),
-                DB::raw('SUM(CASE WHEN kelulusans.status = "tidak_lulus" THEN 1 ELSE 0 END) as tidak_lulus'),
-                DB::raw('ROUND((SUM(CASE WHEN kelulusans.status = "lulus" THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) as persentase_lulus')
-            )
-            ->leftJoin('siswas', 'kelulusans.siswa_id', '=', 'siswas.id')
-            ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
-            ->leftJoin('jurusans', 'kelas.jurusan_id', '=', 'jurusans.id')
-            ->groupBy('jurusan')
-            ->get();
-
-        // Format data untuk Chart.js - Grafik Status Kelulusan (Pie Chart)
-        $statusLabels = ['Lulus', 'Tidak Lulus'];
-        $statusData = [$totalLulus, $totalTidakLulus];
-        $statusColors = ['#10b981', '#ef4444']; // green, red
-
-        // Format data untuk Chart.js - Grafik Per Tahun (Line Chart)
-        $tahunLabels = $statsPerTahun->pluck('tahun_lulus')->reverse()->toArray();
-        $tahunDataLulus = $statsPerTahun->pluck('lulus')->reverse()->toArray();
-        $tahunDataTidakLulus = $statsPerTahun->pluck('tidak_lulus')->reverse()->toArray();
-        $tahunPersentase = $statsPerTahun->pluck('persentase_lulus')->reverse()->toArray();
-
-        // Format data untuk Chart.js - Grafik Per Jurusan (Bar Chart)
-        $jurusanLabels = $statsPerJurusan->pluck('jurusan')->toArray();
-        $jurusanDataLulus = $statsPerJurusan->pluck('lulus')->toArray();
-        $jurusanDataTidakLulus = $statsPerJurusan->pluck('tidak_lulus')->toArray();
-        $jurusanPersentase = $statsPerJurusan->pluck('persentase_lulus')->toArray();
-
-        return [
-            // Data Statistik
-            'totalLulus' => $totalLulus,
-            'totalTidakLulus' => $totalTidakLulus,
-            'totalKeseluruhan' => $totalKeseluruhan,
-            'persentaseLulus' => $persentaseLulus,
+        try {
+            // Statistik Total
+            $totalLulus = Kelulusan::where('status', 'lulus')->count();
+            $totalTidakLulus = Kelulusan::where('status', 'tidak_lulus')->count();
+            $totalKeseluruhan = $totalLulus + $totalTidakLulus;
             
-            // Data untuk Grafik Status (Pie Chart)
-            'statusLabels' => $statusLabels,
-            'statusData' => $statusData,
-            'statusColors' => $statusColors,
+            $persentaseLulus = $totalKeseluruhan > 0 
+                ? round(($totalLulus / $totalKeseluruhan) * 100, 2) 
+                : 0;
+
+            // Statistik per Tahun (5 tahun terakhir)
+            $statsPerTahun = Kelulusan::select(
+                    'tahun_lulus',
+                    DB::raw('COUNT(*) as total'),
+                    DB::raw('SUM(CASE WHEN status = "lulus" THEN 1 ELSE 0 END) as lulus'),
+                    DB::raw('SUM(CASE WHEN status = "tidak_lulus" THEN 1 ELSE 0 END) as tidak_lulus'),
+                    DB::raw('ROUND((SUM(CASE WHEN status = "lulus" THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) as persentase_lulus')
+                )
+                ->groupBy('tahun_lulus')
+                ->orderBy('tahun_lulus', 'asc') // CHANGED: asc untuk urutan chronological
+                ->limit(5)
+                ->get();
+
+            // Statistik per Jurusan
+            $statsPerJurusan = DB::table('kelulusans')
+                ->select(
+                    DB::raw('COALESCE(jurusans.nama_jurusan, kelulusans.jurusan_legacy, "Tidak Diketahui") as jurusan'),
+                    DB::raw('COUNT(*) as total'),
+                    DB::raw('SUM(CASE WHEN kelulusans.status = "lulus" THEN 1 ELSE 0 END) as lulus'),
+                    DB::raw('SUM(CASE WHEN kelulusans.status = "tidak_lulus" THEN 1 ELSE 0 END) as tidak_lulus'),
+                    DB::raw('ROUND((SUM(CASE WHEN kelulusans.status = "lulus" THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) as persentase_lulus')
+                )
+                ->leftJoin('siswas', 'kelulusans.siswa_id', '=', 'siswas.id')
+                ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
+                ->leftJoin('jurusans', 'kelas.jurusan_id', '=', 'jurusans.id')
+                ->groupBy('jurusan')
+                ->get();
+
+            // Format data untuk Chart.js - Grafik Status Kelulusan (Pie Chart)
+            $statusLabels = ['Lulus', 'Tidak Lulus'];
+            $statusData = [$totalLulus, $totalTidakLulus];
+            $statusColors = ['#10b981', '#ef4444']; // green, red
+
+            // Format data untuk Chart.js - Grafik Per Tahun (Line Chart)
+            $tahunLabels = $statsPerTahun->pluck('tahun_lulus')->toArray();
+            $tahunDataLulus = $statsPerTahun->pluck('lulus')->map(function($val) {
+                return (int) $val; // Convert to integer
+            })->toArray();
+            $tahunDataTidakLulus = $statsPerTahun->pluck('tidak_lulus')->map(function($val) {
+                return (int) $val; // Convert to integer
+            })->toArray();
+
+            // Format data untuk Chart.js - Grafik Per Jurusan (Bar Chart)
+            $jurusanLabels = $statsPerJurusan->pluck('jurusan')->toArray();
+            $jurusanDataLulus = $statsPerJurusan->pluck('lulus')->map(function($val) {
+                return (int) $val; // Convert to integer
+            })->toArray();
+            $jurusanDataTidakLulus = $statsPerJurusan->pluck('tidak_lulus')->map(function($val) {
+                return (int) $val; // Convert to integer
+            })->toArray();
+
+            // Debug logging
+            Log::info('Kelulusan Data for Charts', [
+                'tahunLabels' => $tahunLabels,
+                'tahunDataLulus' => $tahunDataLulus,
+                'jurusanLabels' => $jurusanLabels,
+                'jurusanDataLulus' => $jurusanDataLulus,
+            ]);
+
+            return [
+                // Data Statistik
+                'totalLulus' => $totalLulus,
+                'totalTidakLulus' => $totalTidakLulus,
+                'totalKeseluruhan' => $totalKeseluruhan,
+                'persentaseLulus' => $persentaseLulus,
+                
+                // Data untuk Grafik Status (Pie Chart)
+                'statusLabels' => $statusLabels,
+                'statusData' => $statusData,
+                'statusColors' => $statusColors,
+                
+                // Data untuk Grafik Per Tahun (Line Chart)
+                'tahunLabels' => $tahunLabels,
+                'tahunDataLulus' => $tahunDataLulus,
+                'tahunDataTidakLulus' => $tahunDataTidakLulus,
+                
+                // Data untuk Grafik Per Jurusan (Bar Chart)
+                'jurusanLabels' => $jurusanLabels,
+                'jurusanDataLulus' => $jurusanDataLulus,
+                'jurusanDataTidakLulus' => $jurusanDataTidakLulus,
+                
+                // Data Raw untuk Tabel
+                'statsPerTahun' => $statsPerTahun,
+                'statsPerJurusan' => $statsPerJurusan,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error getting kelulusan data: ' . $e->getMessage());
             
-            // Data untuk Grafik Per Tahun (Line Chart)
-            'tahunLabels' => $tahunLabels,
-            'tahunDataLulus' => $tahunDataLulus,
-            'tahunDataTidakLulus' => $tahunDataTidakLulus,
-            'tahunPersentase' => $tahunPersentase,
-            
-            // Data untuk Grafik Per Jurusan (Bar Chart)
-            'jurusanLabels' => $jurusanLabels,
-            'jurusanDataLulus' => $jurusanDataLulus,
-            'jurusanDataTidakLulus' => $jurusanDataTidakLulus,
-            'jurusanPersentase' => $jurusanPersentase,
-            
-            // Data Raw untuk Tabel
-            'statsPerTahun' => $statsPerTahun,
-            'statsPerJurusan' => $statsPerJurusan,
-        ];
+            // Return empty data structure
+            return [
+                'totalLulus' => 0,
+                'totalTidakLulus' => 0,
+                'totalKeseluruhan' => 0,
+                'persentaseLulus' => 0,
+                'statusLabels' => [],
+                'statusData' => [],
+                'statusColors' => [],
+                'tahunLabels' => [],
+                'tahunDataLulus' => [],
+                'tahunDataTidakLulus' => [],
+                'jurusanLabels' => [],
+                'jurusanDataLulus' => [],
+                'jurusanDataTidakLulus' => [],
+                'statsPerTahun' => collect(),
+                'statsPerJurusan' => collect(),
+            ];
+        }
     }
 
     /**
@@ -356,44 +393,5 @@ class DashboardController extends Controller
         ];
 
         return $hari[$dayOfWeek] ?? 'Senin';
-    }
-
-    // ================= ADMIN =================
-    protected function adminDashboard()
-    {
-        $usersCount = User::count();
-        $rolesCount = Role::count();
-        $permissionsCount = Permission::count();
-
-        $labels = ['User', 'Role', 'Permission'];
-        $dataSet = [$usersCount, $rolesCount, $permissionsCount];
-
-        return view('dashboard.admin', compact(
-            'usersCount',
-            'rolesCount',
-            'permissionsCount',
-            'labels',
-            'dataSet'
-        ));
-    }
-
-    // ================= GURU ==================
-    protected function guruDashboard()
-    {
-        return view('dashboard.guru');
-    }
-
-    // ================= WALI KELAS ============
-    protected function waliKelasDashboard()
-    {
-        return view('dashboard.walikelas');
-    }
-    
-    // ================= KEPSEK ================
-    protected function kepsekDashboard()
-    {
-        $kelulusanData = $this->getKelulusanData();
-        
-        return view('dashboard.kepsek', compact('kelulusanData'));
     }
 }

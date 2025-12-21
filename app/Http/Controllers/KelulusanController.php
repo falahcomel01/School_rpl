@@ -135,16 +135,44 @@ class KelulusanController extends Controller
      */
    public function index(Request $request)
 {
+    $user = auth()->user();
+    $activeRole = session('active_role');
+
     $query = Kelulusan::with(['siswa.user', 'siswa.kelas.jurusan', 'aturanKelulusan']);
 
-    if ($request->filled('jurusan')) {
+    // 🔒 BATASI SISWA
+    if ($activeRole === 'siswa') {
+        if (!$user->siswa) {
+            abort(403, 'Akses ditolak');
+        }
+
+        $query->where('siswa_id', $user->siswa->id);
+    }
+
+    // 🔒 BATASI ORANG TUA
+    if ($activeRole === 'orangtua') {
+        if (!$user->orangtua) {
+            abort(403, 'Akses ditolak');
+        }
+
+        $query->where('siswa_id', $user->orangtua->siswa_id);
+    }
+
+    // 🔒 WALI KELAS (kelas yang diampu)
+    if ($activeRole === 'walikelas') {
+        if (!$user->walikelas) {
+            abort(403, 'Akses ditolak');
+        }
+
+        $query->whereHas('siswa', function ($q) use ($user) {
+            $q->where('kelas_id', $user->walikelas->kelas_id);
+        });
+    }
+
+    // Filter jurusan (khusus admin/TU/kepsek)
+    if ($request->filled('jurusan') && in_array($activeRole, ['superadmin','tus','kepsek'])) {
         $query->whereHas('siswa.kelas', function($q) use ($request) {
             $q->where('jurusan_id', $request->jurusan);
-        })->orWhere(function($q) use ($request) {
-            $jurusan = \App\Models\Jurusan::find($request->jurusan);
-            if ($jurusan) {
-                $q->where('jurusan_legacy', $jurusan->nama_jurusan);
-            }
         });
     }
 
@@ -154,6 +182,7 @@ class KelulusanController extends Controller
 
     return view('kelulusan.index', compact('kelulusans', 'aturans', 'jurusans'));
 }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -201,11 +230,42 @@ class KelulusanController extends Controller
      * Display the specified resource.
      */
     public function show(Kelulusan $kelulusan)
-    {
-        $kelulusan->load(['siswa.user', 'aturanKelulusan']);
+{
+    $user = auth()->user();
+    $activeRole = session('active_role');
 
-        return view('kelulusan.show', compact('kelulusan'));
+    // 🔒 SISWA
+    if ($activeRole === 'siswa') {
+        if (!$user->siswa || $kelulusan->siswa_id !== $user->siswa->id) {
+            abort(403, 'Anda tidak berhak melihat data ini');
+        }
     }
+
+    // 🔒 ORANG TUA
+    if ($activeRole === 'orangtua') {
+        if (
+            !$user->orangtua ||
+            $kelulusan->siswa_id !== $user->orangtua->siswa_id
+        ) {
+            abort(403, 'Anda tidak berhak melihat data ini');
+        }
+    }
+
+    // 🔒 WALI KELAS
+    if ($activeRole === 'walikelas') {
+        if (
+            !$user->walikelas ||
+            $kelulusan->siswa->kelas_id !== $user->walikelas->kelas_id
+        ) {
+            abort(403, 'Anda tidak berhak melihat data ini');
+        }
+    }
+
+    $kelulusan->load(['siswa.user', 'aturanKelulusan']);
+
+    return view('kelulusan.show', compact('kelulusan'));
+}
+
 
     /**
      * Show the form for editing the specified resource.
@@ -257,73 +317,142 @@ class KelulusanController extends Controller
             ->route('kelulusan.index')
             ->with('success', 'Data kelulusan berhasil dihapus');
     }
+    
+    /**
+     * Auto-generate kelulusan untuk siswa kelas 12
+     * FIXED: 1 SISWA HANYA BOLEH 1 TAHUN KELULUSAN (SEUMUR HIDUP)
+     */
     public function autoGenerate(Request $request)
-{
-    $request->validate([
-        'tahun_lulus' => 'required|digits:4',
-        'aturan_kelulusan_id' => 'required|exists:aturan_kelulusans,id',
-    ]);
+    {
+        $request->validate([
+            'tahun_lulus' => 'required|digits:4',
+            'aturan_kelulusan_id' => 'required|exists:aturan_kelulusans,id',
+        ]);
 
-    $aturan = AturanKelulusan::findOrFail($request->aturan_kelulusan_id);
+        $aturan = AturanKelulusan::findOrFail($request->aturan_kelulusan_id);
 
-    DB::beginTransaction();
+        DB::beginTransaction();
 
-    try {
-        $siswas = Siswa::with('nilaiAkhir')
+        try {
+            // Ambil ID siswa yang SUDAH PERNAH LULUS (APAPUN TAHUNNYA)
+            // Siswa yang sudah pernah lulus tidak boleh lulus lagi
+            $siswaIdYangSudahPernahLulus = Kelulusan::whereNotNull('siswa_id')
+                ->pluck('siswa_id')
+                ->toArray();
+
+            // Ambil HANYA siswa kelas 12 yang BELUM PERNAH LULUS
+            $siswas = Siswa::with('nilaiAkhir')
+                ->whereHas('kelas', function($query) {
+                    $query->where('nama_kelas', 'LIKE', '%12%');
+                })
+                ->whereNotIn('id', $siswaIdYangSudahPernahLulus) // EXCLUDE yang sudah pernah lulus
+                ->get();
+
+            if ($siswas->isEmpty()) {
+                DB::rollBack();
+                return redirect()
+                    ->route('kelulusan.index')
+                    ->with('warning', 'Semua siswa kelas 12 sudah pernah di-generate. Tidak ada siswa baru yang bisa di-generate.');
+            }
+
+            $berhasil = 0;
+            $dilewati = 0;
+
+            foreach ($siswas as $siswa) {
+                // DOUBLE CHECK: Pastikan siswa belum pernah lulus
+                $sudahPernahLulus = Kelulusan::where('siswa_id', $siswa->id)
+                    ->exists();
+
+                if ($sudahPernahLulus) {
+                    $dilewati++;
+                    continue;
+                }
+
+                // Hitung rata-rata nilai akhir dari semua mata pelajaran
+                $rataRataNilai = $siswa->nilaiAkhir()->avg('nilai_akhir');
+
+                if (is_null($rataRataNilai) || $rataRataNilai == 0) {
+                    $dilewati++;
+                    continue;
+                }
+
+                $status = $rataRataNilai >= $aturan->nilai_minimal
+                    ? 'lulus'
+                    : 'tidak_lulus';
+
+                Kelulusan::create([
+                    'siswa_id'            => $siswa->id,
+                    'aturan_kelulusan_id' => $aturan->id,
+                    'nilai_akhir'         => round($rataRataNilai, 2),
+                    'status'              => $status,
+                    'tahun_lulus'         => $request->tahun_lulus,
+                    'is_legacy'           => false,
+                ]);
+
+                $berhasil++;
+            }
+
+            DB::commit();
+
+            if ($berhasil == 0) {
+                return redirect()
+                    ->route('kelulusan.index')
+                    ->with('warning', "Tidak ada siswa baru yang bisa di-generate. Semua siswa kelas 12 sudah pernah lulus atau tidak memiliki nilai.");
+            }
+
+            return redirect()
+                ->route('kelulusan.index')
+                ->with('success', "Auto-generate selesai: $berhasil siswa berhasil di-generate untuk tahun {$request->tahun_lulus}" . ($dilewati > 0 ? ". $dilewati siswa dilewati (sudah pernah lulus/tidak ada nilai)" : ""));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->with('error', 'Gagal generate kelulusan: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Halaman preview siswa yang akan di-generate
+     * Menampilkan list siswa kelas 12 yang BELUM PERNAH LULUS
+     */
+    public function previewGenerate(Request $request)
+    {
+        $tahunLulus = $request->input('tahun_lulus', date('Y'));
+        
+        // Ambil ID siswa yang SUDAH PERNAH LULUS (apapun tahunnya)
+        $siswaIdYangSudahPernahLulus = Kelulusan::whereNotNull('siswa_id')
+            ->pluck('siswa_id')
+            ->toArray();
+        
+        // Siswa kelas 12 yang BELUM PERNAH LULUS
+        $siswaBelumGenerate = Siswa::with(['user', 'kelas.jurusan', 'nilaiAkhir'])
             ->whereHas('kelas', function($query) {
                 $query->where('nama_kelas', 'LIKE', '%12%');
             })
+            ->whereNotIn('id', $siswaIdYangSudahPernahLulus)
             ->get();
-
-        $berhasil = 0;
-        $dilewati = 0;
-
-        foreach ($siswas as $siswa) {
-
-            // Cegah duplikasi
-            $exists = Kelulusan::where('siswa_id', $siswa->id)
-                ->where('tahun_lulus', $request->tahun_lulus)
-                ->exists();
-
-            if ($exists) {
-                $dilewati++;
-                continue;
-            }
-
-            // Hitung rata-rata nilai akhir dari semua mata pelajaran
-            $rataRataNilai = $siswa->nilaiAkhir()->avg('nilai_akhir');
-
-            if (is_null($rataRataNilai) || $rataRataNilai == 0) {
-                $dilewati++;
-                continue;
-            }
-
-            $status = $rataRataNilai >= $aturan->nilai_minimal
-                ? 'lulus'
-                : 'tidak_lulus';
-
-            Kelulusan::create([
-                'siswa_id'            => $siswa->id,
-                'aturan_kelulusan_id' => $aturan->id,
-                'nilai_akhir'         => round($rataRataNilai, 2),
-                'status'              => $status,
-                'tahun_lulus'         => $request->tahun_lulus,
-                'is_legacy'           => false,
-            ]);
-
-            $berhasil++;
-        }
-
-        DB::commit();
-
-        return redirect()
-            ->route('kelulusan.index')
-            ->with('success', "Auto-generate selesai: $berhasil data dibuat, $dilewati dilewati (hanya kelas 12)");
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-
-        return back()->with('error', 'Gagal generate kelulusan');
+        
+        // Siswa kelas 12 yang SUDAH PERNAH LULUS (dengan info kelulusan)
+        $siswaSudahGenerate = Siswa::with(['user', 'kelas.jurusan'])
+            ->whereHas('kelas', function($query) {
+                $query->where('nama_kelas', 'LIKE', '%12%');
+            })
+            ->whereIn('id', $siswaIdYangSudahPernahLulus)
+            ->get()
+            ->map(function($siswa) {
+                // Ambil data kelulusan siswa (tahun berapa pun)
+                $siswa->kelulusan = Kelulusan::where('siswa_id', $siswa->id)
+                    ->first();
+                return $siswa;
+            });
+        
+        $aturans = AturanKelulusan::orderBy('tahun', 'desc')->get();
+        
+        return view('kelulusan.preview', compact(
+            'siswaBelumGenerate',
+            'siswaSudahGenerate',
+            'tahunLulus',
+            'aturans'
+        ));
     }
-}
 }
