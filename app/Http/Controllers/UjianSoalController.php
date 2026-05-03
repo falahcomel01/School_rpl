@@ -63,8 +63,6 @@ class UjianSoalController extends Controller
         return redirect()->route('ujian.soals.index', $ujian->id)->with('success','Soal ujian diperbarui.');
     }
     
-
-    // Hapus soal dari ujian
     public function destroy(Ujian $ujian, UjianSoal $ujianSoal)
     {
         $ujianSoal->delete();

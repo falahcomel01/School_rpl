@@ -68,7 +68,6 @@ class RekomendasiJurusanController extends Controller
                 return back()->with('success', 'Pilihan jurusan berhasil diperbarui dan menunggu validasi wali kelas.');
             }
 
-            // ❌ Jika pending atau disetujui, TIDAK BOLEH ubah
             return back()->with('error', 'Pilihan jurusan sudah dikirim dan tidak dapat diubah.');
         }
 
@@ -89,7 +88,7 @@ class RekomendasiJurusanController extends Controller
                     'siswa.user',
                     'siswa.nilaiAkhir.mapel',
                     'jurusan',
-                    'jurusanRekomendasi' // ✅ Relasi jurusan rekomendasi (camelCase)
+                    'jurusanRekomendasi' 
                 ])
                 ->latest()
                 ->get();

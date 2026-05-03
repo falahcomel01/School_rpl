@@ -18,7 +18,7 @@ class SoalController extends Controller
         $user = auth()->user();
 
         // Superadmin / TU → lihat semua Jenis Ujian
-        if ($user->hasRole(['superadmin', 'tu'])) {
+        if ($user->hasRole(['superadmin', 'tus'])) {
             $jenisUjians = JenisUjian::with(['guru.user', 'guru.mapel', 'soals'])->get();
         }
         // Guru → lihat jenis ujian miliknya

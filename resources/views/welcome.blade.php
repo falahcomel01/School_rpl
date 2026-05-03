@@ -1,44 +1,75 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMA Cakrawala Gresik - Sistem Informasi Akademik</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Fonts: Poppins (Modern & Clean) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Config Tailwind untuk Blue Theme yang Elegan -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        // Palette Royal Blue Profesional
+                        primary: '#1e3a8a',   /* Deep Blue 900 */
+                        secondary: '#3b82f6', /* Blue 500 */
+                        accent: '#60a5fa',    /* Blue 400 */
+                        slate: {
+                            850: '#151e2e',   /* Lebih gelap dari slate-900 */
+                        }
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(59, 130, 246, 0.15)',
+                        'floating': '0 20px 40px -5px rgba(0, 0, 0, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
+        /* Global Reset & Base */
         body {
             font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
             overflow-x: hidden;
-            background: #faf9f8;
         }
+
+        /* Smooth Scrolling */
+        html { scroll-behavior: smooth; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* ===== PREMIUM LOADING SCREEN ===== */
         #loading-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #dc2626 100%);
+            inset: 0;
+            /* Gradasi Biru Laut Dalam yang Elegan */
+            background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 0.8s ease;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         #loading-screen.hidden {
@@ -46,481 +77,407 @@
             pointer-events: none;
         }
 
-        /* Subtle Particles Background */
-        .particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
+        /* Particle Background */
+        .particles { position: absolute; inset: 0; overflow: hidden; }
         .particle {
             position: absolute;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
-            pointer-events: none;
-            animation: float 15s infinite linear;
+            animation: floatUp 15s infinite linear;
         }
 
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) translateX(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.4;
-            }
-            90% {
-                opacity: 0.4;
-            }
-            100% {
-                transform: translateY(-100vh) translateX(100px);
-                opacity: 0;
-            }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
         }
 
-        /* Logo Container - Elegant Animation */
-        .logo-container {
+        /* Logo Loader */
+        .loader-logo-wrapper {
             position: relative;
-            margin-bottom: 40px;
-            animation: subtlePulse 4s ease-in-out infinite;
-        }
-
-        @keyframes subtlePulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        .logo-circle {
-            width: 180px;
-            height: 180px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
+            width: 140px;
+            height: 140px;
             display: flex;
-            align-items: center;
             justify-content: center;
-            position: relative;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-        }
-
-        .loading-logo {
-            width: 120px;
-            height: 120px;
-            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
-        }
-
-        /* Single Elegant Rotating Ring */
-        .glow-ring {
-            position: absolute;
-            width: 220px;
-            height: 220px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            animation: spin 10s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* School Name */
-        .school-name {
-            color: white;
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .school-tagline {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
-            font-weight: 400;
-            margin-bottom: 40px;
-            letter-spacing: 1px;
-            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Elegant Loading Bar */
-        .loading-bar-container {
-            width: 300px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .loading-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ffffff, #fef3c7);
-            border-radius: 10px;
-            animation: loadingProgress 3s ease-in-out forwards;
-        }
-
-        @keyframes loadingProgress {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
-
-        /* Loading Messages */
-        .loading-message {
-            color: white;
-            font-size: 14px;
-            font-weight: 400;
-            margin-top: 20px;
-            letter-spacing: 0.5px;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-            min-height: 20px;
-        }
-
-        .loading-percentage {
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            margin-top: 10px;
-            font-family: monospace;
-            letter-spacing: 1px;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-        }
-
-        /* Main Content Animations */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.8s ease forwards;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .slide-right {
-            opacity: 0;
-            transform: translateX(20px);
-            animation: slideInRight 0.8s ease forwards;
-            animation-delay: 0.2s;
-        }
-
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        /* Gradient */
-        .red-gradient {
-            background: linear-gradient(135deg, #b91c1c, #ef4444);
-        }
-
-        /* Button Hover */
-        .btn-login {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-        }
-
-        /* Card Hover */
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Navbar Sticky */
-        .navbar-sticky {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        /* Hide main content during loading */
-        body.loading #main-content {
-            opacity: 0;
-        }
-
-        #main-content {
-            opacity: 0;
-            animation: fadeInContent 0.8s ease 0.3s forwards;
-        }
-
-        @keyframes fadeInContent {
-            to { opacity: 1; }
-        }
-
-        /* Hover effects for nav links */
-        .nav-link {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #b91c1c;
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        /* Elegant Facility Icons */
-        .facility-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, rgba(185, 28, 28, 0.1), rgba(239, 68, 68, 0.1));
-            border-radius: 20px;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            margin-bottom: 2rem;
         }
 
-        .facility-icon::before {
-            content: '';
+        .loader-ring {
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #b91c1c, #ef4444);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #60a5fa;
+            border-radius: 50%;
+            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+        }
+
+        .loader-ring:nth-child(2) {
+            width: 85%;
+            height: 85%;
+            border-bottom-color: #fff;
+            animation: spin 2s linear infinite reverse;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loader-img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 260px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #ffffff);
+            width: 0%;
+            transition: width 0.2s ease;
+            box-shadow: 0 0 15px #3b82f6;
+        }
+
+        /* ===== MAIN CONTENT ANIMATIONS ===== */
+        /* Reveal on Scroll */
+        .reveal-up {
             opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 1;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
         }
-
-        .facility-icon i {
-            font-size: 36px;
-            color: #b91c1c;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 2;
-        }
-
-        .facility-card:hover .facility-icon {
-            transform: translateY(-5px);
-        }
-
-        .facility-card:hover .facility-icon::before {
+        .reveal-up.active {
             opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-100 { transition-delay: 0.1s; }
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-300 { transition-delay: 0.3s; }
+
+        /* Glassmorphism Navbar */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .facility-card:hover .facility-icon i {
-            color: white;
-            transform: scale(1.1);
+        /* Card Styles */
+        .modern-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.5rem;
+            transition: all 0.4s ease;
+            overflow: hidden;
         }
 
-        .facility-card {
-            transition: all 0.3s ease;
+        .modern-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(30, 58, 138, 0.15);
+            border-color: #bfdbfe;
         }
 
-        .facility-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        /* Image Hover Effect */
+        .img-hover-zoom {
+            overflow: hidden;
+        }
+        .img-hover-zoom img {
+            transition: transform 0.7s ease;
+        }
+        .img-hover-zoom:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Text Gradients */
+        .text-gradient-blue {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
 
-<body class="loading">
+<body class="loading antialiased selection:bg-blue-100 selection:text-blue-900">
 
     <!-- PREMIUM LOADING SCREEN -->
     <div id="loading-screen">
-        <!-- Subtle Particles -->
         <div class="particles" id="particles"></div>
         
-        <!-- Logo with Elegant Ring -->
-        <div class="logo-container">
-            <div class="glow-ring"></div>
-            <div class="logo-circle">
-                <img src="{{ asset('image/logo-sekolah.png') }}" alt="Logo SMA Cakrawala" class="loading-logo">
-            </div>
+        <div class="loader-logo-wrapper">
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <!-- Blade Asset: Logo -->
+            <img src="{{ asset('image/logo-sekolah.png') }}" alt="Logo SMA Cakrawala" class="loader-img">
         </div>
 
-        <!-- School Information -->
-        <div class="school-name">SMA CAKRAWALA</div>
-        <div class="school-tagline">GRESIK, JAWA TIMUR</div>
+        <h2 class="text-white text-3xl font-bold tracking-widest mb-2 drop-shadow-md">SMA CAKRAWALA</h2>
+        <p class="text-blue-200 text-sm font-medium tracking-[0.2em] mb-8">GRESIK, JAWA TIMUR</p>
 
-        <!-- Elegant Loading Bar -->
-        <div class="loading-bar-container">
-            <div class="loading-bar-fill"></div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
         </div>
-        
-        <!-- Loading Messages -->
-        <div class="loading-message" id="loading-message">Memuat sistem...</div>
-        <div class="loading-percentage" id="loading-percentage">0%</div>
+        <div class="text-blue-300 text-xs mt-4 font-mono" id="loading-text">Memuat sistem...</div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main-content">
-        <!-- Navbar -->
-        <nav class="navbar-sticky shadow-md py-3 px-6 lg:px-8 fade-in">
-            <div class="w-full flex items-center justify-between">
-                <!-- Logo & Name -->
-                <div class="flex items-center gap-2.5">
-                    <img src="{{ asset('image/logo-sekolah.png') }}" alt="Logo SMA Cakrawala" class="w-10 h-10 rounded-full shadow-md">
-                    <div>
-                        <h1 class="font-bold text-base text-[#b91c1c]">SMA Cakrawala</h1>
-                        <p class="text-[10px] text-gray-500">Gresik, Jawa Timur</p>
+    <!-- MAIN WRAPPER -->
+    <div id="main-wrapper" class="opacity-0 transition-opacity duration-1000">
+        
+        <!-- NAVBAR -->
+        <nav class="fixed w-full z-50 glass-nav transition-all duration-300 py-4" id="navbar">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="flex justify-between items-center">
+                    <!-- Logo Area -->
+                    <a href="#" class="flex items-center gap-3 group">
+                        <div class="relative">
+                            <!-- Blade Asset -->
+                            <img src="{{ asset('image/logo-sekolah.png') }}" alt="Logo" class="w-10 h-10 rounded-full border-2 border-blue-100 group-hover:border-blue-500 transition-colors shadow-sm">
+                            <div class="absolute inset-0 rounded-full ring-2 ring-blue-400 opacity-0 group-hover:opacity-20 transition-opacity animate-pulse"></div>
+                        </div>
+                        <div class="leading-none">
+                            <h1 class="font-bold text-lg text-primary leading-tight tracking-tight">SMA Cakrawala</h1>
+                            <p class="text-[10px] text-gray-500 font-medium tracking-wide uppercase">Gresik, Jawa Timur</p>
+                        </div>
+                    </a>
+
+                    <!-- Desktop Menu -->
+                    <div class="hidden md:flex items-center space-x-10">
+                        <a href="#home" class="text-sm font-semibold text-gray-600 hover:text-primary transition-colors relative group py-2">
+                            Beranda
+                            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a>
+                        <a href="#tentang" class="text-sm font-semibold text-gray-600 hover:text-primary transition-colors relative group py-2">
+                            Tentang
+                            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a>
+                        <a href="#visi-misi" class="text-sm font-semibold text-gray-600 hover:text-primary transition-colors relative group py-2">
+                            Visi & Misi
+                            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a>
+                        <a href="#fasilitas" class="text-sm font-semibold text-gray-600 hover:text-primary transition-colors relative group py-2">
+                            Fasilitas
+                            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a>
                     </div>
-                </div>
 
-                <!-- Navigation Links (Desktop) -->
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#home" class="nav-link text-gray-700 hover:text-[#b91c1c] transition font-medium text-sm smooth-link">Beranda</a>
-                    <a href="#tentang" class="nav-link text-gray-700 hover:text-[#b91c1c] transition font-medium text-sm smooth-link">Tentang</a>
-                    <a href="#visi-misi" class="nav-link text-gray-700 hover:text-[#b91c1c] transition font-medium text-sm smooth-link">Visi & Misi</a>
-                    <a href="#fasilitas" class="nav-link text-gray-700 hover:text-[#b91c1c] transition font-medium text-sm smooth-link">Fasilitas</a>
-                </div>
+                    <!-- CTA Button (Desktop) -->
+                    <!-- Blade Route -->
+                    <a href="{{ route('login') }}" class="hidden md:inline-flex items-center px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-full shadow-lg hover:bg-blue-800 hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-0.5">
+                        <i class="fas fa-sign-in-alt mr-2"></i> Login Portal
+                    </a>
 
-                <!-- Login Button -->
-                <a href="{{ route('login') }}" class="red-gradient text-white px-7 py-2.5 rounded-lg font-semibold btn-login shadow-md text-sm">
-                    Login
-                </a>
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="md:hidden text-gray-600 hover:text-primary focus:outline-none p-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Dropdown -->
+            <div id="mobile-menu" class="md:hidden absolute w-full bg-white border-t border-gray-100 shadow-xl max-h-0 overflow-hidden transition-all duration-300">
+                <div class="px-6 py-4 flex flex-col space-y-4">
+                    <a href="#home" class="mobile-link text-gray-600 hover:text-primary font-medium text-sm py-2 border-b border-gray-50">Beranda</a>
+                    <a href="#tentang" class="mobile-link text-gray-600 hover:text-primary font-medium text-sm py-2 border-b border-gray-50">Tentang</a>
+                    <a href="#visi-misi" class="mobile-link text-gray-600 hover:text-primary font-medium text-sm py-2 border-b border-gray-50">Visi & Misi</a>
+                    <a href="#fasilitas" class="mobile-link text-gray-600 hover:text-primary font-medium text-sm py-2 border-b border-gray-50">Fasilitas</a>
+                    <a href="{{ route('login') }}" class="text-center w-full py-3 bg-primary text-white rounded-lg text-sm font-bold shadow-md mt-2">Login Portal</a>
+                </div>
             </div>
         </nav>
 
-        <!-- Hero Section -->
-        <section id="home" class="max-w-7xl mx-auto px-8 lg:px-16 py-20 lg:py-28">
-            <div class="flex flex-col lg:flex-row items-center justify-between gap-16">
-                <!-- Text Content -->
-                <div class="flex-1 fade-in" style="animation-delay: 0.1s;">
-                    <div class="inline-block bg-red-50 text-[#b91c1c] px-5 py-2.5 rounded-full text-base font-semibold mb-6">
-                        Sistem Informasi Akademik Digital
+        <!-- HERO SECTION -->
+        <section id="home" class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+            <!-- Background Blobs (Decoration) -->
+            <div class="absolute top-0 right-0 -mr-40 -mt-40 w-[600px] h-[600px] bg-blue-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse"></div>
+            <div class="absolute bottom-0 left-0 -ml-40 -mb-40 w-[500px] h-[500px] bg-indigo-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse delay-700"></div>
+
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 relative">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <!-- Text Content -->
+                    <div class="reveal-up">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-primary text-xs font-bold uppercase tracking-widest mb-6 border border-blue-100 shadow-sm">
+                            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                            Sistem Informasi Akademik Terintegrasi
+                        </div>
+                        <h2 class="text-5xl lg:text-7xl font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-8">
+                            Membangun Generasi <br>
+                            <span class="text-gradient-blue">Cerdas & Berkarakter</span>
+                        </h2>
+                        <p class="text-slate-600 text-lg mb-10 leading-relaxed max-w-lg">
+                            Selamat datang di SMA Cakrawala Gresik. Platform digital modern yang dirancang untuk mempermudah pengelolaan akademik, absensi, dan pengembangan potensi siswa secara real-time.
+                        </p>
+                        
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#tentang" class="px-8 py-4 bg-primary text-white font-bold rounded-xl shadow-xl hover:bg-blue-900 hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-1 flex items-center gap-2">
+                                Pelajari Profil <i class="fas fa-arrow-right text-sm"></i>
+                            </a>
+                            <a href="#fasilitas" class="px-8 py-4 bg-white text-slate-700 border border-slate-200 font-bold rounded-xl hover:bg-slate-50 hover:border-blue-300 transition-all duration-300 shadow-sm">
+                                Lihat Fasilitas
+                            </a>
+                        </div>
+
+                        <!-- Trusted By / Mini Stats -->
+                        <div class="mt-16 flex items-center gap-8 pt-8 border-t border-slate-200">
+                            <div>
+                                <h3 class="text-4xl font-bold text-primary">25+</h3>
+                                <p class="text-xs text-slate-500 font-medium mt-1 uppercase tracking-wide">Tahun Berdiri</p>
+                            </div>
+                            <div class="w-px h-12 bg-slate-200"></div>
+                            <div>
+                                <h3 class="text-4xl font-bold text-primary">1.2K</h3>
+                                <p class="text-xs text-slate-500 font-medium mt-1 uppercase tracking-wide">Alumni Sukses</p>
+                            </div>
+                            <div class="w-px h-12 bg-slate-200"></div>
+                            <div>
+                                <h3 class="text-4xl font-bold text-primary">A+</h3>
+                                <p class="text-xs text-slate-500 font-medium mt-1 uppercase tracking-wide">Akreditasi</p>
+                            </div>
+                        </div>
                     </div>
-                    <h2 class="text-5xl lg:text-6xl font-extrabold text-gray-800 leading-tight mb-7">
-                        Selamat Datang di<br>
-                        <span class="text-[#b91c1c]">SMA Cakrawala Gresik</span>
-                    </h2>
-                    <p class="text-gray-600 text-xl leading-relaxed mb-10">
-                        Platform digital terintegrasi untuk pengelolaan akademik, absensi, nilai, dan ekstrakurikuler secara efisien dan modern.
-                    </p>
-                    <div class="flex gap-5">
-                        <a href="#tentang" class="red-gradient text-white px-9 py-3.5 rounded-lg font-semibold btn-login shadow-lg smooth-link text-base">
-                            Pelajari Lebih Lanjut
+
+                    <!-- Hero Image -->
+                    <div class="relative reveal-up delay-200">
+                        <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white transform rotate-2 hover:rotate-0 transition-transform duration-700 z-10 group">
+                            <!-- Blade Asset -->
+                            <img src="{{ asset('image/section.png') }}" alt="Ilustrasi Siswa" class="w-full h-auto object-cover">
+                            
+                            <!-- Floating Badge (Overlay) -->
+                            <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur p-4 rounded-2xl shadow-lg flex items-center gap-4 border border-blue-50">
+                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-primary text-xl">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Prestasi Terbaru</p>
+                                    <p class="font-bold text-slate-800 text-sm">Juara Umum Olimpiade Sains Nasional 2024</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Decorative Shadow behind image -->
+                        <div class="absolute -inset-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl blur-2xl opacity-20 -z-10 transform translate-y-4"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TENTANG SECTION -->
+        <section id="tentang" class="py-24 bg-white relative">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-20 items-center">
+                    <!-- Image Grid Layout -->
+                    <div class="relative reveal-up">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-4 mt-8">
+                                <!-- Blade Asset -->
+                                <div class="rounded-2xl overflow-hidden shadow-lg border border-slate-100">
+                                    <img src="{{ asset('image/logo-sekolah.png') }}" alt="Gedung Sekolah" class="w-full h-48 object-cover">
+                                </div>
+                                <div class="rounded-2xl overflow-hidden shadow-lg border border-slate-100 p-6 bg-blue-50 flex flex-col justify-center items-center text-center">
+                                    <i class="fas fa-award text-4xl text-primary mb-2"></i>
+                                    <span class="font-bold text-primary text-sm">Sekolah Unggulan</span>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <!-- Blade Asset -->
+                                <div class="rounded-2xl overflow-hidden shadow-lg border border-slate-100">
+                                    <img src="https://picsum.photos/seed/schoolbuilding/400/500" alt="Kegiatan Sekolah" class="w-full h-64 object-cover">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Text Content -->
+                    <div class="reveal-up delay-200">
+                        <h3 class="text-primary font-bold tracking-widest uppercase text-sm mb-3">Tentang Kami</h3>
+                        <h2 class="text-4xl font-extrabold text-slate-900 mb-6 leading-tight">Dedikasi Untuk Masa Depan Pendidikan</h2>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6">
+                            SMA Cakrawala Gresik berdiri dengan visi mulia untuk mencetak pemimpin masa depan. Kami percaya bahwa pendidikan bukan hanya tentang nilai, tetapi tentang membentuk karakter integritas dan inovasi.
+                        </p>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-8">
+                            Dengan dukungan fasilitas berbasis teknologi dan kurikulum adaptif, kami memastikan setiap siswa siap menghadapi tantangan global di era digital.
+                        </p>
+
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-center gap-4">
+                                <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="text-slate-700 font-medium">Kurikulum Merdeka Belajar Terakreditasi A</span>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="text-slate-700 font-medium">Program Ekstrakurikuler Berbasis Talenta</span>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="text-slate-700 font-medium">Sistem Digital Pintar (Smart School)</span>
+                            </li>
+                        </ul>
+
+                        <a href="#" class="inline-flex items-center font-bold text-primary hover:text-blue-700 transition-colors group">
+                            Lihat Profil Lengkap Sekolah 
+                            <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
                         </a>
                     </div>
                 </div>
-
-                <!-- Image -->
-                <div class="flex-1 slide-right">
-                    <img src="{{ asset('image/section.png') }}" alt="Ilustrasi Siswa" class="w-full max-w-lg mx-auto drop-shadow-2xl">
-                </div>
             </div>
         </section>
 
-        <!-- Tentang Sekolah -->
-        <section id="tentang" class="bg-white py-16 lg:py-20">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="text-center mb-12 fade-in">
-                    <h3 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">Tentang SMA Cakrawala</h3>
-                    <div class="w-20 h-1 red-gradient mx-auto rounded-full"></div>
+        <!-- VISI MISI SECTION -->
+        <section id="visi-misi" class="py-24 bg-slate-50 relative overflow-hidden">
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(#1e3a8a 1px, transparent 1px); background-size: 30px 30px;"></div>
+            
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 relative">
+                <div class="text-center max-w-2xl mx-auto mb-16 reveal-up">
+                    <span class="text-primary font-bold tracking-widest uppercase text-xs mb-2 block">Arah Kami</span>
+                    <h2 class="text-3xl lg:text-4xl font-extrabold text-slate-900 mb-4">Visi & Misi Sekolah</h2>
+                    <div class="w-20 h-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full"></div>
                 </div>
 
-                <div class="grid lg:grid-cols-2 gap-12 items-center">
-                    <div class="fade-in" style="animation-delay: 0.1s;">
-                        <img src="{{ asset('image/logo-sekolah.png') }}" alt="Logo Sekolah" class="w-2/3 mx-auto rounded-2xl shadow-xl">
-                    </div>
-
-                    <div class="fade-in" style="animation-delay: 0.2s;">
-                        <p class="text-gray-600 text-lg leading-relaxed mb-6">
-                            <strong class="text-[#b91c1c]">SMA Cakrawala Gresik</strong> adalah lembaga pendidikan menengah atas yang berkomitmen untuk mencetak generasi unggul, berkarakter, dan berprestasi. Dengan didukung oleh tenaga pendidik profesional dan fasilitas modern, kami menghadirkan pembelajaran yang berkualitas dan berorientasi pada masa depan.
-                        </p>
-                        <p class="text-gray-600 text-lg leading-relaxed mb-6">
-                            Sekolah kami menyediakan berbagai program unggulan seperti kelas akselerasi, ekstrakurikuler yang beragam, dan sistem pembelajaran digital yang terintegrasi untuk mempersiapkan siswa menghadapi tantangan era modern.
-                        </p>
-
-                        <div class="grid grid-cols-3 gap-6 mt-8">
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-[#b91c1c]">10+</div>
-                                <div class="text-sm text-gray-600 mt-1">Tahun Berdiri</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-[#b91c1c]">100+</div>
-                                <div class="text-sm text-gray-600 mt-1">Siswa Aktif</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-[#b91c1c]">30+</div>
-                                <div class="text-sm text-gray-600 mt-1">Tenaga Pendidik</div>
-                            </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Visi Card -->
+                    <div class="modern-card p-10 relative reveal-up">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-blue-400"></div>
+                        <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-primary text-2xl mb-8">
+                            <i class="fas fa-eye"></i>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Visi Misi -->
-        <section id="visi-misi" class="py-16 lg:py-20">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="text-center mb-12 fade-in">
-                    <h3 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">Visi & Misi</h3>
-                    <div class="w-20 h-1 red-gradient mx-auto rounded-full"></div>
-                </div>
-
-                <div class="grid lg:grid-cols-2 gap-8">
-                    <!-- Visi -->
-                    <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in" style="animation-delay: 0.1s;">
-                        <div class="flex items-center gap-4 mb-6">
-                            <div class="w-14 h-14 red-gradient rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                                V
-                            </div>
-                            <h4 class="text-2xl font-bold text-gray-800">Visi</h4>
-                        </div>
-                        <p class="text-gray-600 leading-relaxed">
-                            Menjadi lembaga pendidikan unggul yang menghasilkan generasi cerdas, berkarakter, religius, dan berwawasan global untuk menyongsong masa depan yang gemilang.
+                        <h3 class="text-2xl font-bold text-slate-900 mb-6">Visi Sekolah</h3>
+                        <p class="text-slate-600 leading-relaxed italic border-l-4 border-blue-100 pl-6">
+                            "Menjadi lembaga pendidikan unggul yang menghasilkan generasi cerdas, berkarakter luhur, religius, dan kompetitif di kancah global."
                         </p>
                     </div>
 
-                    <!-- Misi -->
-                    <div class="bg-white p-8 rounded-2xl shadow-lg card-hover fade-in" style="animation-delay: 0.2s;">
-                        <div class="flex items-center gap-4 mb-6">
-                            <div class="w-14 h-14 red-gradient rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                                M
-                            </div>
-                            <h4 class="text-2xl font-bold text-gray-800">Misi</h4>
+                    <!-- Misi Card -->
+                    <div class="modern-card p-10 relative reveal-up delay-200">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-600 to-purple-500"></div>
+                        <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 text-2xl mb-8">
+                            <i class="fas fa-bullseye"></i>
                         </div>
-                        <ul class="text-gray-600 space-y-3">
-                            <li class="flex items-start gap-3">
-                                <span class="text-[#b91c1c] font-bold">•</span>
-                                <span>Menyelenggarakan pendidikan berkualitas dengan kurikulum terkini</span>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-6">Misi Sekolah</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-4">
+                                <span class="mt-1 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                                <span class="text-slate-600">Menyelenggarakan pendidikan berbasis teknologi dan iman.</span>
                             </li>
-                            <li class="flex items-start gap-3">
-                                <span class="text-[#b91c1c] font-bold">•</span>
-                                <span>Mengembangkan karakter siswa melalui nilai-nilai religius dan moral</span>
+                            <li class="flex items-start gap-4">
+                                <span class="mt-1 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                                <span class="text-slate-600">Mengembangkan potensi akademik dan non-akademik siswa.</span>
                             </li>
-                            <li class="flex items-start gap-3">
-                                <span class="text-[#b91c1c] font-bold">•</span>
-                                <span>Memfasilitasi pengembangan bakat dan minat siswa</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="text-[#b91c1c] font-bold">•</span>
-                                <span>Membangun kerjasama dengan berbagai pihak untuk kemajuan pendidikan</span>
+                            <li class="flex items-start gap-4">
+                                <span class="mt-1 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                                <span class="text-slate-600">Membangun kemitraan strategis dengan institusi pendidikan.</span>
                             </li>
                         </ul>
                     </div>
@@ -528,167 +485,236 @@
             </div>
         </section>
 
-        <!-- Fasilitas -->
-        <section id="fasilitas" class="bg-white py-16 lg:py-20">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="text-center mb-12 fade-in">
-                    <h3 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">Fasilitas Unggulan</h3>
-                    <div class="w-20 h-1 red-gradient mx-auto rounded-full"></div>
+        <!-- FASILITAS SECTION -->
+        <section id="fasilitas" class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-16 reveal-up">
+                    <div class="max-w-2xl">
+                        <span class="text-primary font-bold tracking-widest uppercase text-xs mb-2 block">Sarana Prasarana</span>
+                        <h2 class="text-3xl lg:text-4xl font-extrabold text-slate-900">Fasilitas Pendukung</h2>
+                    </div>
+                    <a href="#" class="hidden md:flex items-center text-primary font-bold hover:text-blue-800 transition-colors mt-4 md:mt-0">
+                        Lihat Semua <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
                 </div>
 
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Fasilitas Item - Ruang Kelas -->
-                    <div class="bg-gradient-to-br from-red-50 to-white p-6 rounded-xl shadow-md facility-card fade-in" style="animation-delay: 0.1s;">
-                        <div class="facility-icon">
+                    <!-- Facility 1 -->
+                    <div class="group bg-white p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:shadow-2xl transition-all duration-500 reveal-up">
+                        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-primary text-xl mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                             <i class="fas fa-chalkboard-teacher"></i>
                         </div>
-                        <h5 class="font-bold text-lg text-gray-800 mb-2">Ruang Kelas Modern</h5>
-                        <p class="text-gray-600 text-sm">AC, proyektor, dan fasilitas multimedia lengkap</p>
+                        <h4 class="font-bold text-lg text-slate-900 mb-3 group-hover:text-primary transition-colors">Ruang Kelas Digital</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Dilengkapi Smartboard, AC Sentral, dan CCTV 24 Jam.</p>
                     </div>
 
-                    <!-- Fasilitas Item - Laboratorium -->
-                    <div class="bg-gradient-to-br from-red-50 to-white p-6 rounded-xl shadow-md facility-card fade-in" style="animation-delay: 0.2s;">
-                        <div class="facility-icon">
+                    <!-- Facility 2 -->
+                    <div class="group bg-white p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:shadow-2xl transition-all duration-500 reveal-up delay-100">
+                        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-primary text-xl mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                             <i class="fas fa-flask"></i>
                         </div>
-                        <h5 class="font-bold text-lg text-gray-800 mb-2">Laboratorium</h5>
-                        <p class="text-gray-600 text-sm">Lab Komputer, Fisika, Kimia, dan Biologi</p>
+                        <h4 class="font-bold text-lg text-slate-900 mb-3 group-hover:text-primary transition-colors">Laboratorium Sains</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Lab Kimia, Fisika, dan Biologi dengan peralatan modern.</p>
                     </div>
 
-                    <!-- Fasilitas Item - Perpustakaan -->
-                    <div class="bg-gradient-to-br from-red-50 to-white p-6 rounded-xl shadow-md facility-card fade-in" style="animation-delay: 0.3s;">
-                        <div class="facility-icon">
+                    <!-- Facility 3 -->
+                    <div class="group bg-white p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:shadow-2xl transition-all duration-500 reveal-up delay-200">
+                        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-primary text-xl mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                             <i class="fas fa-book-open"></i>
                         </div>
-                        <h5 class="font-bold text-lg text-gray-800 mb-2">Perpustakaan</h5>
-                        <p class="text-gray-600 text-sm">Koleksi buku yang lengkap</p>
+                        <h4 class="font-bold text-lg text-slate-900 mb-3 group-hover:text-primary transition-colors">E-Perpustakaan</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Ribuan koleksi buku fisik dan digital untuk literasi.</p>
                     </div>
 
-                    <!-- Fasilitas Item - Lapangan Olahraga -->
-                    <div class="bg-gradient-to-br from-red-50 to-white p-6 rounded-xl shadow-md facility-card fade-in" style="animation-delay: 0.4s;">
-                        <div class="facility-icon">
-                            <i class="fas fa-running"></i>
+                    <!-- Facility 4 -->
+                    <div class="group bg-white p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:shadow-2xl transition-all duration-500 reveal-up delay-300">
+                        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-primary text-xl mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                            <i class="fas fa-basketball-ball"></i>
                         </div>
-                        <h5 class="font-bold text-lg text-gray-800 mb-2">Lapangan Olahraga</h5>
-                        <p class="text-gray-600 text-sm">Basket, Voli, Futsal, dan Atletik</p>
+                        <h4 class="font-bold text-lg text-slate-900 mb-3 group-hover:text-primary transition-colors">Sport Center</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Lapangan Basket, Futsal, Voli, dan Gymnasium.</p>
                     </div>
+                </div>
+                
+                <div class="mt-8 text-center md:hidden">
+                    <a href="#" class="inline-flex items-center text-primary font-bold hover:text-blue-800 transition-colors">
+                        Lihat Semua Fasilitas <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
                 </div>
             </div>
         </section>
 
-        <!-- Footer -->
-        <footer class="red-gradient text-white py-8">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="grid md:grid-cols-3 gap-8 mb-6">
-                    <!-- Info -->
-                    <div>
-                        <h5 class="font-bold text-lg mb-4">SMA Cakrawala Gresik</h5>
-                        <p class="text-white/80 text-sm leading-relaxed">
-                            Lembaga pendidikan menengah atas yang berkomitmen mencetak generasi unggul dan berprestasi.
+        <!-- FOOTER -->
+        <footer class="bg-slate-900 text-white pt-20 pb-10 border-t border-slate-800">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="grid md:grid-cols-4 gap-12 mb-16">
+                    <!-- Brand -->
+                    <div class="col-span-1 md:col-span-1">
+                        <div class="flex items-center gap-3 mb-6">
+                            <!-- Blade Asset -->
+                            <img src="{{ asset('image/logo-sekolah.png') }}" alt="Logo" class="w-10 h-10 rounded-full bg-white p-1">
+                            <h2 class="font-bold text-xl tracking-wide">SMA Cakrawala</h2>
+                        </div>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Membentuk karakter, meraih prestasi, dan membangun peradaban melalui pendidikan berkualitas dan berbasis teknologi.
                         </p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all"><i class="fab fa-youtube"></i></a>
+                        </div>
                     </div>
 
-                    <!-- Kontak -->
+                    <!-- Links 1 -->
                     <div>
-                        <h5 class="font-bold text-lg mb-4">Kontak</h5>
-                        <ul class="text-white/80 text-sm space-y-2">
-                            <li>📍 Jl. Pendidikan No. 123, Gresik</li>
-                            <li>📞 (031) 1234-5678</li>
-                            <li>✉️ info@smacakrawala.sch.id</li>
+                        <h4 class="font-bold text-lg mb-6 text-white">Akademik</h4>
+                        <ul class="space-y-4">
+                            <li><a href="#" class="text-slate-400 hover:text-primary text-sm transition-colors">Kalender Pendidikan</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-primary text-sm transition-colors">Kurikulum</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-primary text-sm transition-colors">E-Learning</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-primary text-sm transition-colors">Prestasi Siswa</a></li>
                         </ul>
                     </div>
 
-                    <!-- Link Cepat -->
+                    <!-- Links 2 -->
                     <div>
-                        <h5 class="font-bold text-lg mb-4">Link Cepat</h5>
-                        <ul class="text-white/80 text-sm space-y-2">
-                            <li><a href="#home" class="hover:text-white transition smooth-link">Beranda</a></li>
-                            <li><a href="#tentang" class="hover:text-white transition smooth-link">Tentang Kami</a></li>
-                            <li><a href="{{ route('login') }}" class="hover:text-white transition">Login Sistem</a></li>
+                        <h4 class="font-bold text-lg mb-6 text-white">Informasi</h4>
+                        <ul class="space-y-4">
+                            <li><a href="#" class="text-slate-400 hover:text-primary text-sm transition-colors">PPDB Online</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-primary text-sm transition-colors">Ekstrakurikuler</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-primary text-sm transition-colors">Berita Sekolah</a></li>
+                            <li><a href="#" class="text-slate-400 hover:text-primary text-sm transition-colors">Galeri Foto</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Contact -->
+                    <div>
+                        <h4 class="font-bold text-lg mb-6 text-white">Hubungi Kami</h4>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <i class="fas fa-map-marker-alt mt-1 text-primary"></i>
+                                <span class="text-slate-400 text-sm">Jl. Pendidikan No. 123, Gresik, Jawa Timur 61121</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <i class="fas fa-phone-alt text-primary"></i>
+                                <span class="text-slate-400 text-sm">(031) 395-1234</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <i class="fas fa-envelope text-primary"></i>
+                                <span class="text-slate-400 text-sm">info@smacakrawala.sch.id</span>
+                            </li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="border-t border-white/20 pt-6 text-center text-white/80 text-sm">
-                    © 2025 Sistem Informasi Akademik SMA Cakrawala Gresik. All rights reserved.
+                <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-slate-500 text-sm mb-4 md:mb-0">
+                        © 2025 SMA Cakrawala Gresik. All rights reserved.
+                    </p>
+                    <p class="text-slate-600 text-xs">
+                        Developed with <i class="fas fa-heart text-red-500 mx-1"></i> by IT Division
+                    </p>
                 </div>
             </div>
         </footer>
     </div>
 
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Premium Loading Screen
-        window.addEventListener('load', function() {
-            const loadingMessages = [
-                'Memuat sistem...',
-                'Menyiapkan data...',
-                'Mengecek koneksi...',
-                'Memuat aset...',
-                'Hampir selesai...',
-                'Selamat datang!'
-            ];
-            
-            let messageIndex = 0;
-            const messageElement = document.getElementById('loading-message');
-            
-            // Change loading message
-            const messageInterval = setInterval(() => {
-                if (messageIndex < loadingMessages.length) {
-                    messageElement.textContent = loadingMessages[messageIndex];
-                    messageIndex++;
-                }
-            }, 500);
-
-            // Create subtle particles
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. LOADING SCREEN ---
+            const loadingScreen = document.getElementById('loading-screen');
+            const mainWrapper = document.getElementById('main-wrapper');
+            const progressBar = document.getElementById('progress-bar');
+            const loadingText = document.getElementById('loading-text');
             const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                const size = Math.random() * 3 + 1;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
-                
-                particlesContainer.appendChild(particle);
+
+            // Particles
+            const particleCount = 50;
+            for (let i = 0; i < particleCount; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 4 + 1 + 'px';
+                p.style.width = size;
+                p.style.height = size;
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = Math.random() * 10 + 10 + 's';
+                p.style.animationDelay = Math.random() * 5 + 's';
+                particlesContainer.appendChild(p);
             }
 
-            // Animate loading percentage
-            let percentage = 0;
-            const percentageElement = document.getElementById('loading-percentage');
+            // Progress Logic
+            let progress = 0;
+            const messages = ["Memuat sistem...", "Menyiapkan data...", "Menghubungkan server...", "Siap!"];
             const interval = setInterval(() => {
-                percentage += Math.random() * 10 + 5;
-                if (percentage >= 100) {
-                    percentage = 100;
+                progress += Math.random() * 5;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = progress + '%';
+                
+                if (progress < 30) loadingText.innerText = messages[0];
+                else if (progress < 60) loadingText.innerText = messages[1];
+                else if (progress < 90) loadingText.innerText = messages[2];
+                else loadingText.innerText = messages[3];
+
+                if (progress === 100) {
                     clearInterval(interval);
-                    clearInterval(messageInterval);
-                    messageElement.textContent = 'Selamat datang!';
-                    
-                    // Hide loading screen after reaching 100%
                     setTimeout(() => {
-                        document.getElementById('loading-screen').classList.add('hidden');
-                        document.body.classList.remove('loading');
+                        loadingScreen.classList.add('hidden');
+                        mainWrapper.style.opacity = '1';
                     }, 500);
                 }
-                percentageElement.textContent = Math.floor(percentage) + '%';
-            }, 150);
-        });
+            }, 50);
 
-        // Smooth Scroll without transition overlay
-        document.querySelectorAll('.smooth-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetSection = document.querySelector(targetId);
-                
-                if (targetSection) {
-                    // Direct smooth scroll to target
-                    targetSection.scrollIntoView({ behavior: 'smooth' });
+            // --- 2. MOBILE MENU ---
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('max-h-96'); // Toggle height
+                const icon = btn.querySelector('i');
+                if (menu.classList.contains('max-h-96')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    menu.classList.remove('max-h-96');
+                    const icon = btn.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
+
+            // --- 3. SCROLL REVEAL (Intersection Observer) ---
+            const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
+
+            // --- 4. NAVBAR GLASS EFFECT ON SCROLL ---
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    navbar.classList.add('shadow-md');
+                } else {
+                    navbar.classList.remove('shadow-md');
                 }
             });
         });
     </script>
-
 </body>
 </html>

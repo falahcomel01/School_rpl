@@ -28,7 +28,7 @@ class ekstrakurikuler extends Model
     {
         return $this->belongsToMany(
             Siswa::class,
-            'extra_pesertas',   // 🔥 HARUS SAMA
+            'extra_pesertas',  
             'ekstrakurikuler_id',
             'siswa_id'
         )->withTimestamps();

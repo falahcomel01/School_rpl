@@ -49,7 +49,7 @@ class CatatanPerkembanganController extends Controller implements HasMiddleware
     }
 
     // =====================
-    // GURU / WALI KELAS
+    //  WALI KELAS
     // =====================
     if ($user->guru) {
         $walikelas = Walikelas::where('guru_id', $user->guru->id)->first();
@@ -72,7 +72,7 @@ class CatatanPerkembanganController extends Controller implements HasMiddleware
     // =====================
     // ADMIN
     // =====================
-    if ($user->hasRole('admin')) {
+    if ($user->hasRole('superadmin')) {
         $catatan = CatatanPerkembangan::with(['siswa.user', 'walikelas.guru.user', 'walikelas.kelas'])
             ->paginate(10);
 
@@ -119,7 +119,7 @@ class CatatanPerkembanganController extends Controller implements HasMiddleware
     $validator = Validator::make($request->all(), [
         'siswa_id' => 'required|exists:siswas,id',
         'semester' => 'required|in:ganjil,genap',
-        'tahun_ajaran' => 'required', // contoh: 2024/2025
+        'tahun_ajaran' => 'required', 
         'catatan_akademik' => 'required|string',
         'catatan_non_akademik' => 'required|string',
     ]);

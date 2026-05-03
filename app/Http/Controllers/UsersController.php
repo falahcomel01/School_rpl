@@ -134,15 +134,19 @@ new Middleware('permission:delete roles',only:['destroy']),
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        $user = User::find($id);
+   public function destroy(string $id)
+{
+    $user = User::find($id);
 
-        if (!$user) {
-            return redirect()->route('users.index')->with('error', 'User tidak ditemukan');
-        }
-
-        $user->delete();
-        return redirect()->route('users.index')->with('berhasil', 'User berhasil dihapus');
+    if (!$user) {
+        return redirect()->route('users.index')->with('error', 'User tidak ditemukan');
     }
+
+    if ($user->hasRole('superadmin')) {
+        return redirect()->route('users.index')->with('error', 'Role Superadmin tidak bisa dihapus');
+    }
+
+    $user->delete();
+    return redirect()->route('users.index')->with('berhasil', 'User berhasil dihapus');
+}
 }

@@ -23,8 +23,6 @@ class RaporController extends Controller
         if (session('active_role')) {
             return session('active_role');
         }
-        
-        // Auto detect dari relasi
         if ($user->siswa) return 'siswa';
         if ($user->orangtua) return 'orangtua';
         if ($user->guru && $user->guru->walikelas) return 'walikelas';

@@ -103,7 +103,7 @@ class PresensiController extends Controller
 
             if ($izin) {
                 if ($izin->validasi === 'disetujui') {
-                    $s->status_default = $izin->status;   // izin/sakit
+                    $s->status_default = $izin->status;   
                 } elseif ($izin->validasi === 'ditolak') {
                     $s->status_default = 'alpa';
                 }

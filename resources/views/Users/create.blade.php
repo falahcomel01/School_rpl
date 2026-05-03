@@ -1,10 +1,4 @@
 <x-app-layout>
-  <x-slot name="header">
-    <h2 class="font-semibold text-xl text-red-600 leading-tight page-title">
-      Tambah User
-    </h2>
-  </x-slot>
-
   <div class="py-12">
     <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
       <div class="bg-white shadow-md rounded-lg p-6 form-card">
