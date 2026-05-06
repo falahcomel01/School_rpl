@@ -29,7 +29,7 @@
                 </header>
             @endif
             
-            <main class="page-content p-6">
+            <main class="page-content">
                 {{ $slot }}
             </main>
         </div>

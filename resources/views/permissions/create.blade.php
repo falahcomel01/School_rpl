@@ -1,192 +1,408 @@
 <x-app-layout>
-    <div class="container-permission">
-        <div class="card-permission">
-            <div class="card-header">
-                Form Tambah Permission
-            </div>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
 
-            <div class="card-body">
-                {{-- Alert Error --}}
-                @if ($errors->any())
-                    <div class="alert-error">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+  :root {
+    --n900: #060f22;
+    --n800: #0a1628;
+    --n700: #0e1e3d;
+    --n600: #112554;
+    --n400: #1d4ed8;
+    --n300: #3b82f6;
+    --n200: #60a5fa;
+    --n100: #bfdbfe;
+    --n50:  #eff6ff;
+    --gray-50:  #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-700: #334155;
+    --gray-900: #0f172a;
+    --red-bg:   #fee2e2;
+    --red-tx:   #991b1b;
+    --red-bd:   #fca5a5;
+    --shadow-md: 0 4px 16px rgba(10,22,60,0.10);
+  }
 
-                {{-- Form --}}
-                <form action="{{ route('permissions.store') }}" method="POST">
-                    @csrf
+  /* ── PAGE ── */
+  .cp-page {
+    padding: 28px 20px;
+    font-family: 'DM Sans', sans-serif;
+  }
 
-                    <div class="form-group">
-                        <label for="name">Nama Permission</label>
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            value="{{ old('name') }}"
-                            placeholder="Contoh: edit-posts"
-                            required
-                        >
-                        @error('name')
-                            <p class="text-error">{{ $message }}</p>
-                        @enderror
-                    </div>
+  /* ── CARD ── */
+  .cp-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    max-width: 580px;
+    margin: 0 auto;
+  }
 
-                    <div class="tombol-aksi">
-                        <a href="{{ route('permissions.index') }}" class="btn-batal">Batal</a>
-                        <button type="submit" class="btn-simpan">Simpan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+  /* ── CARD HEADER ── */
+  .cp-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 28px 20px;
+    border-bottom: 1px solid rgba(59,130,246,0.12);
+    background: linear-gradient(135deg, var(--n800) 0%, var(--n600) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cp-card-header::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(59,130,246,0.1);
+    pointer-events: none;
+  }
+
+  .cp-card-header::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; right: 120px;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: rgba(14,165,233,0.07);
+    pointer-events: none;
+  }
+
+  .cp-header-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: #fff;
+    flex-shrink: 0;
+    position: relative; z-index: 1;
+  }
+
+  .cp-header-text {
+    display: flex;
+    flex-direction: column;
+    position: relative; z-index: 1;
+  }
+
+  .cp-header-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .cp-header-sub {
+    font-size: 12px;
+    color: rgba(191,219,254,0.75);
+    margin-top: 3px;
+  }
+
+  /* ── BODY ── */
+  .cp-body {
+    padding: 28px 32px 32px;
+  }
+
+  /* ── ALERT ── */
+  .cp-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-bottom: 22px;
+    border: 1px solid;
+    background: var(--red-bg);
+    border-color: var(--red-bd);
+    color: var(--red-tx);
+  }
+
+  .cp-alert i { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  .cp-alert ul { margin: 6px 0 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .cp-alert ul li { font-size: 12.5px; display: flex; align-items: center; gap: 5px; }
+  .cp-alert ul li::before { content: '•'; font-size: 16px; line-height: 1; }
+
+  /* ── SECTION ── */
+  .cp-section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .cp-section-label-icon {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: var(--n50);
+    border: 1px solid var(--n100);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: var(--n400);
+    flex-shrink: 0;
+  }
+
+  .cp-section-label span {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray-400);
+  }
+
+  /* ── FORM GROUP ── */
+  .cp-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .cp-label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .cp-label-required { color: #ef4444; font-size: 13px; line-height: 1; }
+
+  /* ── INPUT ── */
+  .cp-input-wrap { position: relative; }
+
+  .cp-input-icon {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: var(--gray-400);
+    pointer-events: none;
+    transition: color 0.18s;
+  }
+
+  .cp-input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    background: var(--gray-50);
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    color: var(--gray-900);
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  .cp-input:focus {
+    outline: none;
+    border-color: var(--n300);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+  }
+
+  .cp-input-wrap:focus-within .cp-input-icon { color: var(--n300); }
+
+  .cp-input.is-error { border-color: #f87171; background: #fff5f5; }
+  .cp-input.is-error:focus { box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+
+  /* ── ERROR MSG ── */
+  .cp-error {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #dc2626;
+    font-weight: 500;
+    animation: cp-shake 0.3s ease;
+  }
+
+  .cp-error i { font-size: 10px; flex-shrink: 0; }
+
+  @keyframes cp-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  /* ── HINT TEXT ── */
+  .cp-hint {
+    font-size: 12px;
+    color: var(--gray-400);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .cp-hint i { font-size: 10px; }
+
+  /* ── FOOTER ── */
+  .cp-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px 32px 28px;
+    border-top: 1px solid var(--gray-100);
+    background: var(--gray-50);
+  }
+
+  .cp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1.5px solid;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .cp-btn-back {
+    background: #fff;
+    border-color: var(--gray-200);
+    color: var(--gray-700);
+  }
+
+  .cp-btn-back:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-400);
+    color: var(--gray-900);
+    transform: translateY(-1px);
+  }
+
+  .cp-btn-submit {
+    background: linear-gradient(135deg, var(--n700) 0%, var(--n400) 100%);
+    border-color: var(--n400);
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(29,78,216,0.3);
+  }
+
+  .cp-btn-submit:hover {
+    background: linear-gradient(135deg, var(--n600) 0%, var(--n300) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(29,78,216,0.4);
+  }
+
+  .cp-btn-submit:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(29,78,216,0.25);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .cp-page { padding: 16px 12px; }
+    .cp-body { padding: 20px 18px; }
+    .cp-footer { padding: 16px 18px 20px; flex-direction: column-reverse; align-items: stretch; }
+    .cp-btn { justify-content: center; }
+    .cp-card-header { padding: 18px 20px; }
+  }
+</style>
+
+<div class="cp-page">
+  <div class="cp-card">
+
+    {{-- ── HEADER ── --}}
+    <div class="cp-card-header">
+      <div class="cp-header-icon">
+        <i class="fa-solid fa-key"></i>
+      </div>
+      <div class="cp-header-text">
+        <span class="cp-header-title">Tambah Permission Baru</span>
+        <span class="cp-header-sub">Buat hak akses baru untuk digunakan pada role</span>
+      </div>
     </div>
 
-    {{-- ==== STYLE CSS BIASA ==== --}}
-    <style>
-        body {
-            background: linear-gradient(to bottom right, #fafafa, #f0f0f0);
-            font-family: "Poppins", sans-serif;
-        }
+    {{-- ── FORM ── --}}
+    <form action="{{ route('permissions.store') }}" method="POST">
+      @csrf
 
-        .judul-halaman {
-            font-size: 26px;
-            font-weight: 700;
-            color: #c62828;
-            margin-bottom: 20px;
-        }
+      <div class="cp-body">
 
-        .container-permission {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 80vh;
-            padding: 50px 20px;
-        }
+        {{-- Alert Error --}}
+        @if($errors->any())
+          <div class="cp-alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <div>
+              <div style="font-weight:700; margin-bottom:4px;">Terdapat kesalahan pada form:</div>
+              <ul>
+                @foreach($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
+            </div>
+          </div>
+        @endif
 
-        .card-permission {
-            background: #fff;
-            width: 550px;
-            border-radius: 18px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            animation: fadeIn 0.6s ease;
-            border: 1px solid #e0e0e0;
-        }
+        {{-- ── SECTION ── --}}
+        <div class="cp-section-label">
+          <div class="cp-section-label-icon"><i class="fa-solid fa-circle-info"></i></div>
+          <span>Informasi Permission</span>
+        </div>
 
-        .card-header {
-            background-color: #c62828;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            padding: 15px 25px;
-            border-bottom: 3px solid #b71c1c;
-            letter-spacing: 0.3px;
-        }
+        {{-- Nama Permission --}}
+        <div class="cp-form-group">
+          <label class="cp-label">
+            Nama Permission <span class="cp-label-required">*</span>
+          </label>
+          <div class="cp-input-wrap">
+            <i class="fa-solid fa-key cp-input-icon"></i>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              value="{{ old('name') }}"
+              placeholder="Contoh: edit-posts, view-users"
+              class="cp-input {{ $errors->has('name') ? 'is-error' : '' }}"
+              required
+              autocomplete="off"
+            >
+          </div>
+          @error('name')
+            <div class="cp-error"><i class="fa-solid fa-circle-exclamation"></i> {{ $message }}</div>
+          @enderror
+          <span class="cp-hint">
+            <i class="fa-solid fa-circle-info"></i>
+            Gunakan format <strong>kata-kerja-objek</strong>, contoh: <em>create-users</em>, <em>delete-posts</em>
+          </span>
+        </div>
 
-        .card-body {
-            padding: 35px 40px;
-        }
+      </div>{{-- /.cp-body --}}
 
-        .form-group {
-            margin-bottom: 25px;
-        }
+      {{-- ── FOOTER ── --}}
+      <div class="cp-footer">
+        <a href="{{ route('permissions.index') }}" class="cp-btn cp-btn-back">
+          <i class="fa-solid fa-arrow-left"></i>
+          Batal
+        </a>
+        <button type="submit" class="cp-btn cp-btn-submit">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Simpan Permission
+        </button>
+      </div>
 
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
+    </form>
 
-        .form-group input {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.2s ease;
-        }
+  </div>{{-- /.cp-card --}}
+</div>
 
-        .form-group input:focus {
-            border-color: #c62828;
-            box-shadow: 0 0 5px rgba(198, 40, 40, 0.3);
-            outline: none;
-        }
-
-        .alert-error {
-            background: #ffebee;
-            border: 1px solid #e57373;
-            color: #c62828;
-            padding: 12px 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .alert-error ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .tombol-aksi {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .btn-batal,
-        .btn-simpan {
-            padding: 10px 22px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .btn-batal {
-            background: #f3f3f3;
-            color: #555;
-            border: 1px solid #ccc;
-        }
-
-        .btn-batal:hover {
-            background: #e0e0e0;
-        }
-
-        .btn-simpan {
-            background-color: #c62828;
-            color: white;
-            border: none;
-            box-shadow: 0 3px 8px rgba(198, 40, 40, 0.3);
-        }
-
-        .btn-simpan:hover {
-            background-color: #b71c1c;
-            transform: translateY(-1px);
-        }
-
-        .text-error {
-            color: #c62828;
-            font-size: 13px;
-            margin-top: 5px;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
 </x-app-layout>
