@@ -23,7 +23,7 @@
         <div class="main-content flex-grow-1">
             @if (isset($header))
                 <header class="bg-white shadow">
-                    <div class="container-fluid py-4 px-6">
+                    <div class="container-fluid py-2 px-6">
                         {{ $header }}
                     </div>
                 </header>

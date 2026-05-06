@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         $SuperAdmin = User::create([
             'name' => 'fufufalah',
             'username' => 'falah',
-            'email' => 'falahsi@gmail.com',
+            'email' => '@gmail.cfalahsiom',
           'password' => '12345678'
 
         ]);

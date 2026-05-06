@@ -28,7 +28,7 @@
 
         html, body {
             height: 100%; width: 100%;
-            font-family: 'Plus Jakarta Sans', sans-serif; /* Font modern & bersih */
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f8fafd; color: #0f172a;
             overflow: hidden; /* NO SCROLL */
             -webkit-font-smoothing: antialiased;
@@ -247,6 +247,20 @@
             box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
         }
         .btn-login:hover { background: var(--blue); transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(37,99,235,0.3); }
+        .btn-login:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        /* Error Box */
+        .error-box {
+            background: #fef2f2; color: #991b1b;
+            border: 1px solid #fca5a5;
+            padding: 12px; border-radius: 8px;
+            font-size: 0.85rem; margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 10px;
+            display: none; /* Hidden by default */
+        }
+        .error-box.active { display: flex; animation: shake 0.4s ease-in-out; }
+        
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
 
         /* ── ANIMATIONS ── */
         @keyframes fadeInCard { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -328,12 +342,37 @@
                 <h2 class="form-title">Login</h2>
                 <p class="form-desc">Silakan masuk untuk mengakses fitur akademik.</p>
 
-                <form id="loginForm" onsubmit="event.preventDefault();">
+                <!-- 
+                    PERUBAHAN LOGIC LARAVEL DISINI:
+                    1. action="{{ route('login') }}" -> Mengirim ke Controller Login
+                    2. method="POST" -> Metode request
+                    3. @csrf -> Token keamanan Laravel
+                -->
+                <form id="loginForm" method="POST" action="{{ route('login') }}">
+                    @csrf
+
+                    <!-- Error Box (Logic Blade) -->
+                    @if ($errors->any())
+                        <div class="error-box active">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ $errors->first() }}</span>
+                        </div>
+                    @endif
+
                     <div class="input-group">
                         <label class="input-label">Username / NIS</label>
                         <div class="input-wrap">
                             <i class="fas fa-user input-prefix-icon"></i>
-                            <input type="text" class="form-input" placeholder="Contoh: user123" required autofocus>
+                            <!-- Menambahkan name="input_type" dan value old() -->
+                            <input 
+                                type="text" 
+                                name="input_type" 
+                                class="form-input" 
+                                placeholder="Contoh: user123" 
+                                value="{{ old('input_type') }}"
+                                required 
+                                autofocus
+                            >
                         </div>
                     </div>
 
@@ -341,18 +380,32 @@
                         <label class="input-label">Password</label>
                         <div class="input-wrap">
                             <i class="fas fa-lock input-prefix-icon"></i>
-                            <input type="password" class="form-input" id="pass" placeholder="••••••••" required>
+                            <!-- Menambahkan name="password" -->
+                            <input 
+                                type="password" 
+                                name="password" 
+                                class="form-input" 
+                                id="pass" 
+                                placeholder="••••••••" 
+                                required
+                            >
                             <button type="button" class="pw-toggle" onclick="document.getElementById('pass').type = (document.getElementById('pass').type==='password'?'text':'password')">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-login">Masuk Sekarang</button>
-                    
-                    <div style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: #94a3b8;">
-                        <a href="#" style="color: var(--blue); text-decoration: none; font-weight: 600;">Lupa password?</a>
+                    <!-- Options -->
+                    <div style="display:flex; justify-content:space-between; margin-bottom:1rem; font-size:0.85rem; color:#64748b;">
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                            <input type="checkbox" name="remember"> Ingat saya
+                        </label>
+                        <a href="#" style="color:var(--blue); text-decoration:none;">Lupa password?</a>
                     </div>
+
+                    <button type="submit" class="btn-login" id="btn-submit">
+                        <span>Masuk Sekarang</span>
+                    </button>
                 </form>
             </div>
         </div>
@@ -360,14 +413,26 @@
     </div>
 
     <script>
-        // Simple logic for toggling password if needed (handled inline above but good to have here)
-        document.getElementById('loginForm').addEventListener('submit', function() {
-            const btn = this.querySelector('.btn-login');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+        // Logic Loading & Submit
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('btn-submit');
+            const originalContent = btn.innerHTML;
+            
+            // Tampilkan Loading
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Memverifikasi...';
+            btn.disabled = true;
+            btn.style.opacity = '0.8';
+
+            // Tidak ada event.preventDefault() lagi.
+            // Browser akan secara otomatis submit form ke route('login').
+            // Jika berhasil login, Laravel Controller akan me-redirect user
+            // (biasanya ke /dashboard).
+            
+            // Sedikit delay agar user lihat animasi loading (opsional, 300ms)
             setTimeout(() => {
-                btn.innerHTML = 'Login Berhasil';
-                btn.style.background = '#10b981';
-            }, 1500);
+                // this.submit() sudah dilakukan secara native oleh HTML form
+                // Jadi kita biarkan saja browser bekerja.
+            }, 300);
         });
     </script>
 
