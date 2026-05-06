@@ -1,1783 +1,1196 @@
 <!-- resources/views/layouts/navigation.blade.php -->
 <nav>
-    <!-- === SIDEBAR === -->
+    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
-        <!-- ✅ LOGO SECTION (INTEGRATED WITH SIDEBAR) -->
-        <div class="sidebar-logo-section">
-            <div class="logo-container">
-                <img src="{{ asset('image/logo-sekolah.png') }}" alt="Logo Sekolah" class="logo-image" 
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                <!-- Fallback icon jika gambar tidak ada -->
-                <i class="fa-solid fa-graduation-cap" style="display: none; font-size: 28px; color: #e63946;"></i>
+
+        {{-- LOGO --}}
+        <div class="sb-logo">
+            <div class="sb-logo-img">
+                <img src="{{ asset('image/logo-sekolah.png') }}" alt="Logo"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <div class="sb-logo-fallback" style="display:none;">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
             </div>
-            <div class="logo-text">
-                <h4 class="school-name">SMA CAKRAWALA</h4>
-                <p class="school-tagline">Excellence in Education</p>
+            <div class="sb-logo-text">
+                <span class="sb-school-name">SMA CAKRAWALA</span>
+                <span class="sb-school-tag">Excellence in Education</span>
             </div>
         </div>
-        
-        <div class="sidebar-divider"></div>
 
-        <div class="sidebar-header">
-            <button id="toggleSidebar" class="nav-link btn-toggle">
-                <i class="fa-solid fa-bars"></i>
-                <span class="link-text">Menu</span>
-            </button>
-        </div>
-        
-        <div class="sidebar-divider"></div>
+        {{-- TOGGLE --}}
+        <button class="sb-toggle" id="toggleSidebar" title="Toggle Sidebar (Ctrl+B)">
+            <i class="fa-solid fa-bars-staggered"></i>
+            <span class="sb-lbl">Sembunyikan Menu</span>
+        </button>
 
-        <!-- ✅ SIDEBAR MENU -->
-        <div class="sidebar-menu">
-            <!-- Dashboard -->
-            <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                <i class="fa-solid fa-chart-line"></i>
-                <span class="link-text">Dashboard</span>
+        {{-- NAV MENU --}}
+        <div class="sb-menu" id="sbMenu">
+
+            <div class="sb-section-label">Utama</div>
+
+            <a href="{{ route('dashboard') }}" class="sb-link {{ request()->routeIs('dashboard') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-gauge-high"></i></span>
+                <span class="sb-lbl">Dashboard</span>
             </a>
 
-            <!-- Manajemen User -->
+            {{-- MANAJEMEN USER --}}
             @canany(['view users', 'view roles', 'view permissions'])
-            <div class="nav-item-elite-red-dropdown {{ request()->routeIs('users.*','roles.*','permissions.*','landing.setting.*','orangtua.*') ? 'active' : '' }}">
-                <button class="nav-link elite-red-dropdown-toggle d-flex align-items-center">
-                    <i class="fa-solid fa-users-gear"></i>
-                    <span class="link-text">Manajemen User</span>
-                    <i class="fa-solid fa-chevron-right toggle-icon ms-auto"></i>
+            <div class="sb-section-label">Sistem</div>
+            <div class="sb-drop {{ request()->routeIs('users.*','roles.*','permissions.*') ? 'is-open' : '' }}">
+                <button class="sb-link sb-drop-toggle">
+                    <span class="sb-icon"><i class="fa-solid fa-users-gear"></i></span>
+                    <span class="sb-lbl">Manajemen User</span>
+                    <span class="sb-arrow"><i class="fa-solid fa-chevron-down"></i></span>
                 </button>
-                <div class="elite-red-inline-dropdown-menu">
-                    <a href="{{ route('users.index') }}" class="elite-red-dropdown-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-user"></i>
-                        <span>Users</span>
-                    </a>
-                    <a href="{{ route('roles.index') }}" class="elite-red-dropdown-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-user-tag"></i>
-                        <span>Roles</span>
-                    </a>
-                    <a href="{{ route('permissions.index') }}" class="elite-red-dropdown-item {{ request()->routeIs('permissions.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-key"></i>
-                        <span>Permissions</span>
-                    </a>
+                <div class="sb-drop-panel">
+                    <div>
+                        <a href="{{ route('users.index') }}" class="sb-sub {{ request()->routeIs('users.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-user"></i><span>Users</span>
+                        </a>
+                        <a href="{{ route('roles.index') }}" class="sb-sub {{ request()->routeIs('roles.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-user-tag"></i><span>Roles</span>
+                        </a>
+                        <a href="{{ route('permissions.index') }}" class="sb-sub {{ request()->routeIs('permissions.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-key"></i><span>Permissions</span>
+                        </a>
+                    </div>
                 </div>
             </div>
             @endcanany
 
-            <!-- Manajemen Kelas -->
+            {{-- MANAJEMEN KELAS --}}
             @canany(['view users', 'view roles', 'view permissions'])
-            <div class="nav-item-elite-red-dropdown {{ request()->routeIs('kelas.*','jurusan.*','mapel.*') ? 'active' : '' }}">
-                <button class="nav-link elite-red-dropdown-toggle d-flex align-items-center">
-                    <i class="fa-solid fa-building-columns"></i>
-                    <span class="link-text">Manajemen Kelas</span>
-                    <i class="fa-solid fa-chevron-right toggle-icon ms-auto"></i>
+            <div class="sb-drop {{ request()->routeIs('kelas.*','jurusan.*','mapel.*') ? 'is-open' : '' }}">
+                <button class="sb-link sb-drop-toggle">
+                    <span class="sb-icon"><i class="fa-solid fa-building-columns"></i></span>
+                    <span class="sb-lbl">Manajemen Kelas</span>
+                    <span class="sb-arrow"><i class="fa-solid fa-chevron-down"></i></span>
                 </button>
-                <div class="elite-red-inline-dropdown-menu">
-                    <a href="{{ route('kelas.index') }}" class="elite-red-dropdown-item {{ request()->routeIs('kelas.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-door-open"></i>
-                        <span>Kelas</span>
-                    </a>
-                    <a href="{{ route('jurusan.index') }}" class="elite-red-dropdown-item {{ request()->routeIs('jurusan.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                        <span>Jurusan</span>
-                    </a>
-                    <a href="{{ route('mapel.index') }}" class="elite-red-dropdown-item {{ request()->routeIs('mapel.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-book-open"></i>
-                        <span>Matapelajaran</span>
-                    </a>
+                <div class="sb-drop-panel">
+                    <div>
+                        <a href="{{ route('kelas.index') }}" class="sb-sub {{ request()->routeIs('kelas.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-door-open"></i><span>Kelas</span>
+                        </a>
+                        <a href="{{ route('jurusan.index') }}" class="sb-sub {{ request()->routeIs('jurusan.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-graduation-cap"></i><span>Jurusan</span>
+                        </a>
+                        <a href="{{ route('mapel.index') }}" class="sb-sub {{ request()->routeIs('mapel.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-book-open"></i><span>Mata Pelajaran</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-            @endcanany   
-       @canany(['view guru'])
-<div class="nav-item-elite-red-dropdown {{ request()->routeIs('guru.*','pembina.*','orangtua.*') ? 'active' : '' }}">
-    <button class="nav-link elite-red-dropdown-toggle d-flex align-items-center">
-        <i class="fa-solid fa-chalkboard-user"></i>
-        <span class="link-text">Manajemen Data Pengajar</span>
-        <i class="fa-solid fa-chevron-right toggle-icon ms-auto"></i>
-    </button>
+            @endcanany
 
-    <div class="elite-red-inline-dropdown-menu">
+            {{-- MANAJEMEN DATA PENGAJAR --}}
+            @canany(['view guru'])
+            <div class="sb-drop {{ request()->routeIs('guru.*','pembina.*','orangtua.*') ? 'is-open' : '' }}">
+                <button class="sb-link sb-drop-toggle">
+                    <span class="sb-icon"><i class="fa-solid fa-chalkboard-user"></i></span>
+                    <span class="sb-lbl">Data Pengajar</span>
+                    <span class="sb-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+                </button>
+                <div class="sb-drop-panel">
+                    <div>
+                        <a href="{{ route('guru.index') }}" class="sb-sub {{ request()->routeIs('guru.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-user-tie"></i><span>Data Guru</span>
+                        </a>
+                        <a href="{{ route('pembina.index') }}" class="sb-sub {{ request()->routeIs('pembina.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-people-group"></i><span>Data Pembina Ekstra</span>
+                        </a>
+                        <a href="{{ route('orangtua.index') }}" class="sb-sub {{ request()->routeIs('orangtua.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-user-shield"></i><span>Orang Tua</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endcanany
 
-        <a href="{{ route('guru.index') }}"
-           class="elite-red-dropdown-item {{ request()->routeIs('guru.*') ? 'active' : '' }}">
-            <i class="fa-solid fa-user-tie"></i>
-            <span>Data Guru</span>
-        </a>
+            <div class="sb-section-label">Akademik</div>
 
-        <a href="{{ route('pembina.index') }}"
-           class="elite-red-dropdown-item {{ request()->routeIs('pembina.*') ? 'active' : '' }}">
-            <i class="fa-solid fa-people-group"></i>
-            <span>Data Pembina Ekstra</span>
-        </a>
-
-        <a href="{{ route('orangtua.index') }}"
-           class="elite-red-dropdown-item {{ request()->routeIs('orangtua.*') ? 'active' : '' }}">
-            <i class="fa-solid fa-user-shield"></i>
-            <span>Orangtua</span>
-        </a>
-
-    </div>
-</div>
-@endcanany
-
-   <!-- Data Siswa -->
             @can('view siswa')
-            <a href="{{ route('siswa.index') }}" class="nav-link {{ request()->routeIs('siswa.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-users"></i>
-                <span class="link-text">Data Siswa</span>
+            <a href="{{ route('siswa.index') }}" class="sb-link {{ request()->routeIs('siswa.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-users"></i></span>
+                <span class="sb-lbl">Data Siswa</span>
             </a>
             @endcan
-            <!-- Wali Kelas -->
+
             @can('view walikelas')
-            <a href="{{ route('walikelas.index') }}" class="nav-link {{ request()->routeIs('walikelas.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-id-card-clip"></i>
-                <span class="link-text">Wali Kelas</span>
+            <a href="{{ route('walikelas.index') }}" class="sb-link {{ request()->routeIs('walikelas.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-id-card-clip"></i></span>
+                <span class="sb-lbl">Wali Kelas</span>
             </a>
             @endcan
 
-            <!-- Jadwal -->
             @can('view jadwal')
-            <a href="{{ route('jadwal.index') }}" class="nav-link {{ request()->routeIs('jadwal.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-calendar-days"></i>
-                <span class="link-text">Jadwal</span>
+            <a href="{{ route('jadwal.index') }}" class="sb-link {{ request()->routeIs('jadwal.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-calendar-days"></i></span>
+                <span class="sb-lbl">Jadwal</span>
             </a>
             @endcan
 
-            <!-- Presensi -->
             @can('view presensisiswa')
-            <a href="{{ route('presensi.index') }}" class="nav-link {{ request()->routeIs('presensi.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-clipboard-check"></i>
-                <span class="link-text">Presensi</span>
+            <a href="{{ route('presensi.index') }}" class="sb-link {{ request()->routeIs('presensi.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-clipboard-check"></i></span>
+                <span class="sb-lbl">Presensi</span>
             </a>
             @endcan
 
-            <!-- Perizinan -->
             @can('view perizinan')
-            <a href="{{ route('perizinan.index') }}" class="nav-link {{ request()->routeIs('perizinan.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-file-circle-check"></i>
-                <span class="link-text">Perizinan</span>
+            <a href="{{ route('perizinan.index') }}" class="sb-link {{ request()->routeIs('perizinan.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-file-circle-check"></i></span>
+                <span class="sb-lbl">Perizinan</span>
             </a>
             @endcan
 
             @can('view tugas')
-            <a href="{{ route('tugas.index') }}" class="nav-link {{ request()->routeIs('tugas.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-laptop-file"></i>
-                <span class="link-text">Tugas Online</span>
+            <a href="{{ route('tugas.index') }}" class="sb-link {{ request()->routeIs('tugas.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-laptop-file"></i></span>
+                <span class="sb-lbl">Tugas Online</span>
             </a>
             @endcan
+
             @can('view catatan_perkembangan')
-            <a href="{{ route('catatan_perkembangan.index') }}" class="nav-link {{ request()->routeIs('catatan_perkembangan.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-book-bookmark"></i>
-                <span class="link-text">Catatan Perkembangan</span>
+            <a href="{{ route('catatan_perkembangan.index') }}" class="sb-link {{ request()->routeIs('catatan_perkembangan.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-book-bookmark"></i></span>
+                <span class="sb-lbl">Catatan Perkembangan</span>
             </a>
-@endcan
-            <!-- Materi Pembelajaran -->
+            @endcan
+
+            {{-- MATERI PEMBELAJARAN --}}
             @canany('view materi')
-            <div class="nav-item-elite-red-dropdown {{ request()->routeIs('jenis-ujian.*','soal.*','ujian.*') ? 'active' : '' }}">
-                <button class="nav-link elite-red-dropdown-toggle d-flex align-items-center">
-                    <i class="fa-solid fa-book-open-reader"></i>
-                    <span class="link-text">Materi Pembelajaran</span>
-                    <i class="fa-solid fa-chevron-right toggle-icon ms-auto"></i>
+            <div class="sb-section-label">Pembelajaran</div>
+            <div class="sb-drop {{ request()->routeIs('jenis-ujian.*','soal.*','ujian.*') ? 'is-open' : '' }}">
+                <button class="sb-link sb-drop-toggle">
+                    <span class="sb-icon"><i class="fa-solid fa-book-open-reader"></i></span>
+                    <span class="sb-lbl">Materi & Ujian</span>
+                    <span class="sb-arrow"><i class="fa-solid fa-chevron-down"></i></span>
                 </button>
-                <div class="elite-red-inline-dropdown-menu">
-                    <a href="{{ route('jenis-ujian.index') }}" class="elite-red-dropdown-item {{ request()->routeIs('jenis-ujian.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-list-check"></i>
-                        <span>Jenis Ujian</span>
-                    </a>
-                    <a href="{{ route('soal.index') }}" class="elite-red-dropdown-item {{ request()->routeIs('soal.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-circle-question"></i>
-                        <span>Soal</span>
-                    </a>
-                    <a href="{{ route('ujian.index') }}" class="elite-red-dropdown-item {{ request()->routeIs('ujian.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-file-lines"></i>
-                        <span>Ujian</span>
-                    </a>
+                <div class="sb-drop-panel">
+                    <div>
+                        <a href="{{ route('jenis-ujian.index') }}" class="sb-sub {{ request()->routeIs('jenis-ujian.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-list-check"></i><span>Jenis Ujian</span>
+                        </a>
+                        <a href="{{ route('soal.index') }}" class="sb-sub {{ request()->routeIs('soal.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-circle-question"></i><span>Soal</span>
+                        </a>
+                        <a href="{{ route('ujian.index') }}" class="sb-sub {{ request()->routeIs('ujian.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-file-lines"></i><span>Ujian</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-@endcanany
+            @endcanany
+
             @if(Auth::user()->siswa)
-            <a href="{{ route('ujian_siswa.index') }}" class="nav-link {{ request()->routeIs('ujian_siswa.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-pen-to-square"></i>
-                <span class="link-text">Ujian Siswa</span>
+            <a href="{{ route('ujian_siswa.index') }}" class="sb-link {{ request()->routeIs('ujian_siswa.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                <span class="sb-lbl">Ujian Siswa</span>
             </a>
             @endif
 
-            <!-- Rekap Nilai (Untuk Guru) -->
             @if(Auth::user()->guru)
-            <a href="{{ route('rekap_nilai.index') }}" class="nav-link {{ request()->routeIs('rekap_nilai.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-chart-column"></i>
-                <span class="link-text">Rekap Nilai</span>
-            </a>
-            @endif
-              @if(Auth::user()->siswa)
-            <a href="{{ route('rekap_nilai.siswa') }}" class="nav-link {{ request()->routeIs('rekap_nilai.siswa') ? 'active' : '' }}">
-                <i class="fa-solid fa-file-alt"></i>
-                <span class="link-text">Rekap Nilai Saya</span>
+            <a href="{{ route('rekap_nilai.index') }}" class="sb-link {{ request()->routeIs('rekap_nilai.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-chart-column"></i></span>
+                <span class="sb-lbl">Rekap Nilai</span>
             </a>
             @endif
 
-          <!-- Rapor Saya (SISWA & ORANG TUA) -->
-@if(
-    session('active_role') === 'siswa' ||
-    session('active_role') === 'orangtua'
-)
-    <a href="{{ route('rapor.siswa') }}"
-       class="nav-link {{ request()->routeIs('rapor.siswa*') ? 'active' : '' }}">
-        <i class="fa-solid fa-file-lines"></i>
-        <span class="link-text">
-            {{ session('active_role') === 'orangtua' ? 'Rapor Anak' : 'Rapor Saya' }}
-        </span>
-    </a>
-@endif
+            @if(Auth::user()->siswa)
+            <a href="{{ route('rekap_nilai.siswa') }}" class="sb-link {{ request()->routeIs('rekap_nilai.siswa') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-file-alt"></i></span>
+                <span class="sb-lbl">Rekap Nilai Saya</span>
+            </a>
+            @endif
 
+            @if(session('active_role') === 'siswa' || session('active_role') === 'orangtua')
+            <a href="{{ route('rapor.siswa') }}" class="sb-link {{ request()->routeIs('rapor.siswa*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-file-lines"></i></span>
+                <span class="sb-lbl">{{ session('active_role') === 'orangtua' ? 'Rapor Anak' : 'Rapor Saya' }}</span>
+            </a>
+            @endif
 
-            <!-- Rapor (Untuk Guru & Superadmin) -->
             @if(Auth::user()->walikelas || Auth::user()->roles->contains('name', 'superadmin'))
-            <a href="{{ route('rapor.index') }}" class="nav-link {{ request()->routeIs('rapor.index', 'rapor.create', 'rapor.show') ? 'active' : '' }}">
-                <i class="fa-solid fa-file-pdf"></i>
-                <span class="link-text">Rapor</span>
+            <a href="{{ route('rapor.index') }}" class="sb-link {{ request()->routeIs('rapor.index','rapor.create','rapor.show') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-file-pdf"></i></span>
+                <span class="sb-lbl">Rapor</span>
             </a>
             @endif
-          @can('view extra')
-            <a href="{{ route('ekstrakurikulers.index') }}" class="nav-link {{ request()->routeIs('ekstrakurikulers.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-futbol"></i>
-                <span class="link-text">Ekstrakurikuler</span>
+
+            {{-- EKSKUL & PRESTASI --}}
+            @can('view extra')
+            <div class="sb-section-label">Ekstrakurikuler</div>
+            <a href="{{ route('ekstrakurikulers.index') }}" class="sb-link {{ request()->routeIs('ekstrakurikulers.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-futbol"></i></span>
+                <span class="sb-lbl">Ekstrakurikuler</span>
             </a>
-            <a href="{{ route('presensi_ekstra.index') }}" class="nav-link {{ request()->routeIs('presensi_ekstra.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-clipboard-user"></i>
-                <span class="link-text">Presensi Ekstra</span>
+            <a href="{{ route('presensi_ekstra.index') }}" class="sb-link {{ request()->routeIs('presensi_ekstra.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-clipboard-user"></i></span>
+                <span class="sb-lbl">Presensi Ekstra</span>
             </a>
             @endcan
+
             @can('view prestasi')
-            <a href="{{ route('prestasi.index') }}" class="nav-link {{ request()->routeIs('prestasi.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-trophy"></i>
-                <span class="link-text">Prestasi</span>
-            </a> @endcan
-             @can('view aturankelulusan')
-            <a href="{{ route('aturan-kelulusan.index') }}" class="nav-link {{ request()->routeIs('aturan-kelulusan.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-file-contract"></i>
-                <span class="link-text">Aturan Kelulusan</span>
+            <a href="{{ route('prestasi.index') }}" class="sb-link {{ request()->routeIs('prestasi.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-trophy"></i></span>
+                <span class="sb-lbl">Prestasi</span>
             </a>
-@endcan
-        
-@php
-    use Illuminate\Support\Facades\Auth;
+            @endcan
 
-    $user = Auth::user();
+            {{-- KELULUSAN --}}
+            @php
+                $user = Auth::user();
+                $canViewKelulusan = false;
+                if ($user->siswa && $user->siswa->kelas) {
+                    $nk = $user->siswa->kelas->nama_kelas;
+                    if (str_contains($nk,'12') || preg_match('/\bXII\b/i',$nk)) $canViewKelulusan = true;
+                }
+                if ($user->hasAnyRole(['tus','kepsek','superadmin'])) $canViewKelulusan = true;
 
-    /*
-    |--------------------------------------------------------------------------
-    | MENU KELULUSAN
-    |--------------------------------------------------------------------------
-    | - Siswa kelas 12
-    | - TU, Kepsek, Superadmin
-    */
-    $canViewKelulusan = false;
+                $canViewRekomendasi = false;
+                if ($user->siswa && $user->siswa->kelas) {
+                    $nk = $user->siswa->kelas->nama_kelas;
+                    if (str_contains($nk,'10') || preg_match('/\bX\b/i',$nk)) $canViewRekomendasi = true;
+                }
 
-    if ($user->siswa && $user->siswa->kelas) {
-        $namaKelasSiswa = $user->siswa->kelas->nama_kelas;
+                $canViewValidasiJurusan = false;
+                if ($user->walikelas && $user->walikelas->kelas) {
+                    $nk = $user->walikelas->kelas->nama_kelas;
+                    if (str_contains($nk,'10') || preg_match('/\bX\b/i',$nk)) $canViewValidasiJurusan = true;
+                }
+            @endphp
 
-        if (
-            str_contains($namaKelasSiswa, '12') ||
-            preg_match('/\bXII\b/i', $namaKelasSiswa)
-        ) {
-            $canViewKelulusan = true;
-        }
-    }
+            @if($canViewKelulusan || $canViewRekomendasi || $canViewValidasiJurusan)
+            <div class="sb-section-label">Kelulusan</div>
+            @endif
 
-    if ($user->hasAnyRole(['tus', 'kepsek', 'superadmin'])) {
-        $canViewKelulusan = true;
-    }
+            @can('view aturankelulusan')
+            <a href="{{ route('aturan-kelulusan.index') }}" class="sb-link {{ request()->routeIs('aturan-kelulusan.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-file-contract"></i></span>
+                <span class="sb-lbl">Aturan Kelulusan</span>
+            </a>
+            @endcan
 
-    /*
-    |--------------------------------------------------------------------------
-    | MENU REKOMENDASI JURUSAN
-    |--------------------------------------------------------------------------
-    | - SISWA kelas 10 SAJA
-    */
-    $canViewRekomendasi = false;
+            @if($canViewValidasiJurusan)
+            <a href="{{ route('rekomendasi.daftar') }}" class="sb-link {{ request()->routeIs('rekomendasi.daftar') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-clipboard-check"></i></span>
+                <span class="sb-lbl">Validasi Rekomendasi</span>
+            </a>
+            @endif
 
-    if ($user->siswa && $user->siswa->kelas) {
-        $namaKelasSiswa = $user->siswa->kelas->nama_kelas;
+            @if($canViewRekomendasi)
+            <a href="{{ route('rekomendasi.index') }}" class="sb-link {{ request()->routeIs('rekomendasi.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-route"></i></span>
+                <span class="sb-lbl">Pengajuan Jurusan</span>
+            </a>
+            @endif
 
-        if (
-            str_contains($namaKelasSiswa, '10') ||
-            preg_match('/\bX\b/i', $namaKelasSiswa)
-        ) {
-            $canViewRekomendasi = true;
-        }
-    }
+            @if($canViewKelulusan)
+            <a href="{{ route('kelulusan.index') }}" class="sb-link {{ request()->routeIs('kelulusan.*') ? 'is-active' : '' }}">
+                <span class="sb-icon"><i class="fa-solid fa-graduation-cap"></i></span>
+                <span class="sb-lbl">Kelulusan</span>
+            </a>
+            @endif
 
-    /*
-    |--------------------------------------------------------------------------
-    | MENU VALIDASI REKOMENDASI
-    |--------------------------------------------------------------------------
-    | - WALI KELAS kelas 10 SAJA
-    */
-    $canViewValidasiJurusan = false;
+        </div>{{-- /.sb-menu --}}
 
-    if ($user->walikelas && $user->walikelas->kelas) {
-        $namaKelasWali = $user->walikelas->kelas->nama_kelas;
-
-        if (
-            str_contains($namaKelasWali, '10') ||
-            preg_match('/\bX\b/i', $namaKelasWali)
-        ) {
-            $canViewValidasiJurusan = true;
-        }
-    }
-@endphp
-
-{{-- ===================== --}}
-{{-- VALIDASI REKOMENDASI --}}
-{{-- (WALI KELAS 10 SAJA) --}}
-{{-- ===================== --}}
-@if($canViewValidasiJurusan)
-<a href="{{ route('rekomendasi.daftar') }}"
-   class="nav-link {{ request()->routeIs('rekomendasi.daftar') ? 'active' : '' }}">
-    <i class="fa-solid fa-clipboard-check"></i>
-    <span class="link-text">Validasi Rekomendasi</span>
-</a>
-@endif
-
-{{-- ===================== --}}
-{{-- REKOMENDASI JURUSAN --}}
-{{-- (SISWA KELAS 10) --}}
-{{-- ===================== --}}
-@if($canViewRekomendasi)
-<a href="{{ route('rekomendasi.index') }}"
-   class="nav-link {{ request()->routeIs('rekomendasi.*') ? 'active' : '' }}">
-    <i class="fa-solid fa-route"></i>
-    <span>Pengajuan Jurusan</span>
-</a>
-@endif
-
-{{-- ===================== --}}
-{{-- KELULUSAN --}}
-{{-- ===================== --}}
-@if($canViewKelulusan)
-<a href="{{ route('kelulusan.index') }}"
-   class="nav-link {{ request()->routeIs('kelulusan.*') ? 'active' : '' }}">
-    <i class="fa-solid fa-graduation-cap"></i>
-    <span>Kelulusan</span>
-</a>
-@endif
-
-
+        {{-- BOTTOM USER BADGE --}}
+        <div class="sb-user-foot">
+            <div class="sb-user-avatar">
+                @if(Auth::user()->guru && Auth::user()->guru->foto_profile)
+                    <img src="{{ asset('storage/' . Auth::user()->guru->foto_profile) }}" alt="Avatar">
+                @elseif(Auth::user()->siswa && Auth::user()->siswa->foto_profile)
+                    <img src="{{ asset('storage/' . Auth::user()->siswa->foto_profile) }}" alt="Avatar">
+                @else
+                    <i class="fa-solid fa-user"></i>
+                @endif
+            </div>
+            <div class="sb-user-info">
+                <span class="sb-user-name">{{ Str::limit(Auth::user()->name, 18) }}</span>
+                <span class="sb-user-role">{{ ucfirst(session('active_role') ?? Auth::user()->roles->first()->name ?? 'User') }}</span>
+            </div>
+            <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+                @csrf
+                <button class="sb-logout" type="submit" title="Logout">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+            </form>
         </div>
+
     </aside>
 
-    <!-- === HEADER === -->
-    <header class="navbar-top shadow-sm d-flex align-items-center justify-content-between px-4" id="mainHeader">
-        <div class="d-flex align-items-center gap-3">
-            <div class="breadcrumb-section">
-                <h5 class="fw-semibold mb-0">
-                    @if (request()->routeIs('dashboard'))
-                        Dashboard
-                    @elseif (request()->routeIs('users.*'))
-                        Manajemen User
-                    @elseif (request()->routeIs('roles.*'))
-                        Roles
-                    @elseif (request()->routeIs('permissions.*'))
-                        Permissions
-                    @elseif (request()->routeIs('orangtua.*'))
-                        Data Orangtua
-                    @elseif (request()->routeIs('kelas.*'))
-                        Manajemen Kelas
-                    @elseif (request()->routeIs('jurusan.*'))
-                        Jurusan
-                    @elseif (request()->routeIs('mapel.*'))
-                        Mata Pelajaran
-                    @elseif (request()->routeIs('siswa.*'))
-                        Data Siswa
-                    @elseif (request()->routeIs('guru.*'))
-                        Data Guru
-                    @elseif (request()->routeIs('jadwal.*'))
-                        Jadwal
-                    @elseif (request()->routeIs('presensi.*'))
-                        Presensi
-                    @elseif (request()->routeIs('walikelas.*'))
-                        Wali Kelas
-                    @elseif (request()->routeIs('perizinan.*'))
-                        Perizinan
-                    @elseif (request()->routeIs('tugas.*'))
-                        Tugas Online
-                    @elseif (request()->routeIs('soal.*'))
-                        Soal
-                    @elseif (request()->routeIs('ujian.*'))
-                        Ujian
-                    @elseif (request()->routeIs('ujian_siswa.*'))
-                        Ujian Siswa
-                    @elseif (request()->routeIs('rekap_nilai.*'))
-                        Rekap Nilai
-                    @elseif (request()->routeIs('rapor.*'))
-                        Rapor
-                    @elseif (request()->routeIs('profile.*'))
-                        Profil
+    <!-- ===== HEADER ===== -->
+    <header class="topbar" id="mainHeader">
+        <div class="topbar-left">
+            <div class="topbar-page">
+                <span class="topbar-page-icon">
+                    @if(request()->routeIs('dashboard')) <i class="fa-solid fa-gauge-high"></i>
+                    @elseif(request()->routeIs('users.*')) <i class="fa-solid fa-users"></i>
+                    @elseif(request()->routeIs('roles.*')) <i class="fa-solid fa-user-tag"></i>
+                    @elseif(request()->routeIs('permissions.*')) <i class="fa-solid fa-key"></i>
+                    @elseif(request()->routeIs('kelas.*')) <i class="fa-solid fa-door-open"></i>
+                    @elseif(request()->routeIs('jurusan.*')) <i class="fa-solid fa-graduation-cap"></i>
+                    @elseif(request()->routeIs('mapel.*')) <i class="fa-solid fa-book-open"></i>
+                    @elseif(request()->routeIs('siswa.*')) <i class="fa-solid fa-users"></i>
+                    @elseif(request()->routeIs('guru.*')) <i class="fa-solid fa-chalkboard-user"></i>
+                    @elseif(request()->routeIs('jadwal.*')) <i class="fa-solid fa-calendar-days"></i>
+                    @elseif(request()->routeIs('presensi.*')) <i class="fa-solid fa-clipboard-check"></i>
+                    @elseif(request()->routeIs('walikelas.*')) <i class="fa-solid fa-id-card-clip"></i>
+                    @elseif(request()->routeIs('perizinan.*')) <i class="fa-solid fa-file-circle-check"></i>
+                    @else <i class="fa-solid fa-circle-dot"></i>
                     @endif
-                </h5>
+                </span>
+                <div>
+                    <span class="topbar-page-name">
+                        @if(request()->routeIs('dashboard')) Dashboard
+                        @elseif(request()->routeIs('users.*')) Manajemen User
+                        @elseif(request()->routeIs('roles.*')) Roles
+                        @elseif(request()->routeIs('permissions.*')) Permissions
+                        @elseif(request()->routeIs('orangtua.*')) Data Orang Tua
+                        @elseif(request()->routeIs('kelas.*')) Manajemen Kelas
+                        @elseif(request()->routeIs('jurusan.*')) Jurusan
+                        @elseif(request()->routeIs('mapel.*')) Mata Pelajaran
+                        @elseif(request()->routeIs('siswa.*')) Data Siswa
+                        @elseif(request()->routeIs('guru.*')) Data Guru
+                        @elseif(request()->routeIs('jadwal.*')) Jadwal
+                        @elseif(request()->routeIs('presensi.*')) Presensi
+                        @elseif(request()->routeIs('walikelas.*')) Wali Kelas
+                        @elseif(request()->routeIs('perizinan.*')) Perizinan
+                        @elseif(request()->routeIs('tugas.*')) Tugas Online
+                        @elseif(request()->routeIs('ujian.*')) Ujian
+                        @elseif(request()->routeIs('ujian_siswa.*')) Ujian Siswa
+                        @elseif(request()->routeIs('rekap_nilai.*')) Rekap Nilai
+                        @elseif(request()->routeIs('rapor.*')) Rapor
+                        @elseif(request()->routeIs('profile.*')) Profil Saya
+                        @elseif(request()->routeIs('kelulusan.*')) Kelulusan
+                        @elseif(request()->routeIs('prestasi.*')) Prestasi
+                        @else Halaman
+                        @endif
+                    </span>
+                    <span class="topbar-breadcrumb">SMA Cakrawala &rsaquo; {{ request()->routeIs('dashboard') ? 'Dashboard' : 'Menu' }}</span>
+                </div>
             </div>
         </div>
 
-        <div class="header-actions d-flex align-items-center gap-3">
-            <!-- Profile Dropdown -->
-            <div class="dropdown profile">
-                <button class="profile-btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
-                    <div class="profile-avatar me-2">
+        <div class="topbar-right">
+            {{-- Date badge --}}
+            <div class="topbar-date">
+                <i class="fa-regular fa-calendar"></i>
+                {{ now()->translatedFormat('d M Y') }}
+            </div>
+
+            {{-- Profile dropdown --}}
+            <div class="topbar-profile" id="profileDropdown">
+                <button class="topbar-profile-btn" id="profileBtn">
+                    <div class="topbar-avatar">
                         @if(Auth::user()->guru && Auth::user()->guru->foto_profile)
-                            <img src="{{ asset('storage/' . Auth::user()->guru->foto_profile) }}" alt="Profile Picture">
+                            <img src="{{ asset('storage/' . Auth::user()->guru->foto_profile) }}" alt="Profile">
                         @elseif(Auth::user()->siswa && Auth::user()->siswa->foto_profile)
-                            <img src="{{ asset('storage/' . Auth::user()->siswa->foto_profile) }}" alt="Profile Picture">
+                            <img src="{{ asset('storage/' . Auth::user()->siswa->foto_profile) }}" alt="Profile">
                         @elseif(Auth::user()->superadmin && Auth::user()->superadmin->foto_profile)
-                            <img src="{{ asset('storage/' . Auth::user()->superadmin->foto_profile) }}" alt="Profile Picture">
-                        @elseif(Auth::user()->tus && Auth::user()->tus->foto_profile)
-                            <img src="{{ asset('storage/' . Auth::user()->tus->foto_profile) }}" alt="Profile Picture">
+                            <img src="{{ asset('storage/' . Auth::user()->superadmin->foto_profile) }}" alt="Profile">
                         @else
                             <i class="fa-solid fa-user"></i>
                         @endif
                     </div>
-                    <div class="profile-info">
-                        <span class="profile-name">{{ Auth::user()->name }}</span>
-                        <small class="profile-role">{{ Auth::user()->roles->first()->name ?? 'User' }}</small>
+                    <div class="topbar-profile-info">
+                        <span class="topbar-name">{{ Str::limit(Auth::user()->name, 20) }}</span>
+                        <span class="topbar-role">{{ ucfirst(Auth::user()->roles->first()->name ?? 'User') }}</span>
                     </div>
+                    <i class="fa-solid fa-chevron-down topbar-caret"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end elite-dropdown">
-                    <li class="dropdown-header">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="profile-avatar-lg">
-                                @if(Auth::user()->guru && Auth::user()->guru->foto_profile)
-                                    <img src="{{ asset('storage/' . Auth::user()->guru->foto_profile) }}" alt="Profile">
-                                @elseif(Auth::user()->siswa && Auth::user()->siswa->foto_profile)
-                                    <img src="{{ asset('storage/' . Auth::user()->siswa->foto_profile) }}" alt="Profile">
-                                @elseif(Auth::user()->superadmin && Auth::user()->superadmin->foto_profile)
-                                    <img src="{{ asset('storage/' . Auth::user()->superadmin->foto_profile) }}" alt="Profile">
-                                @elseif(Auth::user()->tus && Auth::user()->tus->foto_profile)
-                                    <img src="{{ asset('storage/' . Auth::user()->tus->foto_profile) }}" alt="Profile">
-                                @else
-                                    <i class="fa-solid fa-user"></i>
-                                @endif
-                            </div>
-                            <div>
-                                <div class="fw-bold">{{ Auth::user()->name }}</div>
-                                <small class="text-muted">{{ Auth::user()->email }}</small>
-                            </div>
+
+                <div class="topbar-dropdown" id="profileMenu">
+                    <div class="topbar-dd-head">
+                        <div class="topbar-dd-avatar">
+                            @if(Auth::user()->guru && Auth::user()->guru->foto_profile)
+                                <img src="{{ asset('storage/' . Auth::user()->guru->foto_profile) }}" alt="Profile">
+                            @elseif(Auth::user()->siswa && Auth::user()->siswa->foto_profile)
+                                <img src="{{ asset('storage/' . Auth::user()->siswa->foto_profile) }}" alt="Profile">
+                            @else
+                                <i class="fa-solid fa-user"></i>
+                            @endif
                         </div>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <a class="dropdown-item" href="{{ route('profile.index') }}">
-                            <i class="fa-regular fa-id-card me-2"></i> Profil Saya
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button class="dropdown-item text-danger fw-semibold" type="submit">
-                                <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Logout
-                            </button>
-                        </form>
-                    </li>
-                </ul>
+                        <div>
+                            <p class="topbar-dd-name">{{ Auth::user()->name }}</p>
+                            <p class="topbar-dd-email">{{ Auth::user()->email }}</p>
+                        </div>
+                    </div>
+                    <div class="topbar-dd-divider"></div>
+                    <a href="{{ route('profile.index') }}" class="topbar-dd-item">
+                        <i class="fa-regular fa-id-card"></i> Profil Saya
+                    </a>
+                    <div class="topbar-dd-divider"></div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button class="topbar-dd-item topbar-dd-logout" type="submit">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
 </nav>
-<style>
-/* === GOOGLE FONTS === */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
-/* === GLOBAL STYLES === */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+<style>
+/* ============================================
+   IMPORTS & RESET
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-    overflow-x: hidden;
+  font-family: 'DM Sans', sans-serif;
+  background: #eef2f9;
+  overflow-x: hidden;
 }
 
-/* === SIDEBAR === */
+/* ============================================
+   SIDEBAR SHELL
+   ============================================ */
 .sidebar {
-    width: 260px;
-    background: linear-gradient(180deg, #1a0000 0%, #4a0000 50%, #780000 100%);
-    color: #fff;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    z-index: 1000;
-    box-shadow: 4px 0 20px rgba(193, 18, 31, 0.3);
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    overflow: hidden;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  --sb-w: 268px;
+  --sb-w-c: 72px;
+
+  /* === BLUE THEME PALETTE === */
+  --sb-bg:         #0e1e3d;          /* deep navy */
+  --sb-bg-mid:     #112554;          /* mid layer */
+  --sb-accent:     #3b82f6;          /* vivid blue */
+  --sb-accent-2:   #60a5fa;          /* lighter blue */
+  --sb-accent-soft: rgba(59,130,246,0.14);
+  --sb-glow:       rgba(59,130,246,0.25);
+  --sb-text:       rgba(220,230,255,0.78);
+  --sb-text-dim:   rgba(148,172,220,0.5);
+  --sb-border:     rgba(99,140,220,0.12);
+
+  width: var(--sb-w);
+  background: var(--sb-bg);
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+  border-right: 1px solid var(--sb-border);
+  box-shadow: 4px 0 24px rgba(14,30,61,0.45);
 }
 
+/* Ambient blue glow at top */
 .sidebar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-.sidebar.collapsed {
-    width: 80px;
-}
-
-/* === LOGO SECTION === */
-.sidebar-logo-section {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 20px 15px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s ease;
-}
-
-.sidebar-logo-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 123, 115, 0.1) 0%, transparent 70%);
-    animation: pulse 3s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-}
-
-.logo-container {
-    width: 55px;
-    height: 55px;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.5);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.4s ease;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 1;
-}
-
-.logo-container::after {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border-radius: 17px;
-    background: linear-gradient(45deg, #ff7b73, #ff3c3c, #e63946);
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.sidebar:not(.collapsed) .logo-container:hover::after {
-    opacity: 1;
-    animation: rotate 2s linear infinite;
-}
-
-@keyframes rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.logo-image {
-    width: 45px;
-    height: 45px;
-    border-radius: 10px;
-    object-fit: cover;
-}
-
-.logo-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    transition: all 0.4s ease;
-    position: relative;
-    z-index: 1;
-}
-
-.school-name {
-    font-size: 18px;
-    font-weight: 700;
-    color: #fff;
-    margin: 0;
-    letter-spacing: 1px;
-    text-shadow: 0 2px 10px rgba(255, 123, 115, 0.5);
-    background: linear-gradient(90deg, #fff 0%, #ff7b73 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.school-tagline {
-    font-size: 10px;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.7);
-    margin: 0;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-.sidebar.collapsed .logo-text {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
-}
-
-.sidebar.collapsed .sidebar-logo-section {
-    justify-content: center;
-    padding: 20px 10px;
-}
-
-/* === SIDEBAR HEADER === */
-.sidebar-header {
-    width: 100%;
-    padding: 10px 15px;
-}
-
-.btn-toggle {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
-    font-weight: 500;
-    font-size: 14px;
-    padding: 12px 15px;
-    border-radius: 12px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-toggle::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 123, 115, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.5s, height 0.5s;
-}
-
-.btn-toggle:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-.btn-toggle:hover {
-    background: rgba(255, 123, 115, 0.2);
-    border-color: rgba(255, 123, 115, 0.5);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 123, 115, 0.3);
-}
-
-.btn-toggle i {
-    font-size: 18px;
-    color: #ff7b73;
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
-}
-
-.btn-toggle:hover i {
-    transform: rotate(90deg);
-    color: #fff;
-}
-
-.sidebar.collapsed .btn-toggle {
-    justify-content: center;
-}
-
-.sidebar.collapsed .btn-toggle .link-text {
-    display: none;
-}
-
-.sidebar-divider {
-    width: 85%;
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
-    margin: 10px auto;
-}
-
-/* === SIDEBAR MENU === */
-.sidebar-menu {
-    width: 100%;
-    padding: 10px 15px;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    max-height: calc(100vh - 280px);
-    scrollbar-width: thin;
-    scrollbar-color: #ff7b73 transparent;
-}
-
-.sidebar-menu::-webkit-scrollbar {
-    width: 5px;
-}
-
-.sidebar-menu::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.sidebar-menu::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #ff7b73, #ff3c3c);
-    border-radius: 10px;
-}
-
-/* === NAV LINKS === */
-.sidebar .nav-link {
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 500;
-    font-size: 14px;
-    padding: 12px 15px;
-    border-radius: 12px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: transparent;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 5px;
-}
-
-.sidebar .nav-link::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 3px;
-    background: linear-gradient(180deg, #ff7b73, #ff3c3c);
-    transform: scaleY(0);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.sidebar .nav-link:hover::before,
-.sidebar .nav-link.active::before {
-    transform: scaleY(1);
-}
-
-.sidebar .nav-link:hover {
-    background: rgba(255, 123, 115, 0.15);
-    color: #fff;
-    transform: translateX(5px);
-}
-
-.sidebar .nav-link.active {
-    background: linear-gradient(90deg, rgba(255, 123, 115, 0.3), rgba(255, 60, 60, 0.2));
-    color: #fff;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(255, 123, 115, 0.2);
-}
-
-.sidebar .nav-link i {
-    font-size: 18px;
-    color: #ff7b73;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.sidebar .nav-link:hover i,
-.sidebar .nav-link.active i {
-    color: #fff;
-    transform: scale(1.1);
-}
-
-/* === DROPDOWN === */
-.nav-item-elite-red-dropdown {
-    width: 100%;
-    margin-bottom: 5px;
-}
-
-.elite-red-dropdown-toggle {
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 500;
-    font-size: 14px;
-    padding: 12px 15px;
-    border-radius: 12px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: transparent;
-    border: none;
-    text-align: left;
-    position: relative;
-    overflow: hidden;
-}
-
-.elite-red-dropdown-toggle::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 3px;
-    background: linear-gradient(180deg, #ff7b73, #ff3c3c);
-    transform: scaleY(0);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.elite-red-dropdown-toggle:hover {
-    background: rgba(255, 123, 115, 0.15);
-    color: #fff;
-    transform: translateX(5px);
-}
-
-.elite-red-dropdown-toggle:hover::before {
-    transform: scaleY(1);
-}
-
-.elite-red-dropdown-toggle i:not(.toggle-icon) {
-    font-size: 18px;
-    color: #ff7b73;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.elite-red-dropdown-toggle:hover i:not(.toggle-icon) {
-    transform: scale(1.1);
-    color: #fff;
-}
-
-.nav-item-elite-red-dropdown.active .elite-red-dropdown-toggle {
-    background: linear-gradient(90deg, rgba(255, 123, 115, 0.3), rgba(255, 60, 60, 0.2));
-    color: #fff;
-    font-weight: 600;
-}
-
-.nav-item-elite-red-dropdown.active .elite-red-dropdown-toggle::before {
-    transform: scaleY(1);
-}
-
-.nav-item-elite-red-dropdown.active .elite-red-dropdown-toggle i:not(.toggle-icon) {
-    color: #fff;
-}
-
-.toggle-icon {
-    font-size: 12px;
-    color: #ff7b73;
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    margin-left: auto;
-}
-
-.nav-item-elite-red-dropdown.active .toggle-icon,
-.elite-red-dropdown-toggle:hover .toggle-icon {
-    color: #fff;
-}
-
-.nav-item-elite-red-dropdown.active .toggle-icon {
-    transform: rotate(90deg);
-}
-
-/* ✅ FIXED DROPDOWN MENU - DISPLAY NONE LOGIC */
-.elite-red-inline-dropdown-menu {
-    display: none;
-    flex-direction: column;
-    margin-top: 0;
-    margin-left: 15px;
-    border-left: 2px solid rgba(255, 123, 115, 0.3);
-    padding-left: 10px;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                margin-top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: top;
-}
-
-.elite-red-inline-dropdown-menu.show {
-    display: flex;
-    max-height: 500px;
-    opacity: 1;
-    margin-top: 8px;
-}
-
-.elite-red-dropdown-item {
-    color: rgba(255, 255, 255, 0.7);
-    padding: 10px 15px;
-    font-size: 13px;
-    font-weight: 400;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    margin-bottom: 3px;
-    position: relative;
-    overflow: hidden;
-    transform: translateX(0);
-}
-
-.elite-red-dropdown-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 123, 115, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.elite-red-dropdown-item:hover::before {
-    width: 200%;
-    height: 200%;
-}
-
-.elite-red-dropdown-item:hover {
-    color: #fff;
-    background: rgba(255, 123, 115, 0.15);
-    transform: translateX(8px);
-}
-
-.elite-red-dropdown-item i {
-    font-size: 14px;
-    color: #ff7b73;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    z-index: 1;
-}
-
-.elite-red-dropdown-item:hover i {
-    color: #fff;
-    transform: rotate(5deg) scale(1.1);
-}
-
-.elite-red-dropdown-item span {
-    position: relative;
-    z-index: 1;
-}
-
-.elite-red-dropdown-item.active {
-    background: rgba(255, 123, 115, 0.25);
-    color: #fff;
-    font-weight: 500;
-}
-
-.elite-red-dropdown-item.active i {
-    color: #fff;
-}
-
-/* Animation when dropdown opens */
-.elite-red-inline-dropdown-menu.show .elite-red-dropdown-item {
-    animation: slideInFromLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    opacity: 0;
-}
-
-.elite-red-inline-dropdown-menu.show .elite-red-dropdown-item:nth-child(1) {
-    animation-delay: 0.05s;
-}
-
-.elite-red-inline-dropdown-menu.show .elite-red-dropdown-item:nth-child(2) {
-    animation-delay: 0.1s;
-}
-
-.elite-red-inline-dropdown-menu.show .elite-red-dropdown-item:nth-child(3) {
-    animation-delay: 0.15s;
-}
-
-.elite-red-inline-dropdown-menu.show .elite-red-dropdown-item:nth-child(4) {
-    animation-delay: 0.2s;
-}
-
-.elite-red-inline-dropdown-menu.show .elite-red-dropdown-item:nth-child(5) {
-    animation-delay: 0.25s;
-}
-
-@keyframes slideInFromLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Collapsed States */
-.sidebar.collapsed .link-text,
-.sidebar.collapsed .elite-red-inline-dropdown-menu,
-.sidebar.collapsed .toggle-icon {
-    display: none;
-}
-
-.sidebar.collapsed .nav-link,
-.sidebar.collapsed .elite-red-dropdown-toggle {
-    justify-content: center;
-    padding: 12px;
-}
-
-.sidebar.collapsed .elite-red-dropdown-item {
-    padding: 10px;
-    justify-content: center;
-}
-
-/* === HEADER === */
-.navbar-top {
-    width: calc(100% - 260px);
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    color: #2c3e50;
-    height: 70px;
-    position: fixed;
-    top: 0;
-    left: 260px;
-    z-index: 999;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 30px;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(10px);
-}
-
-.sidebar.collapsed ~ #mainHeader {
-    width: calc(100% - 80px);
-    left: 80px;
-}
-
-.breadcrumb-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.breadcrumb-section i {
-    color: #e63946;
-    font-size: 16px;
-}
-
-.breadcrumb-section h5 {
-    color: #2c3e50;
-    font-weight: 600;
-    margin: 0;
-    font-size: 18px;
-}
-
-/* === HEADER ACTIONS === */
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.icon-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: rgba(230, 57, 70, 0.1);
-    border: none;
-    color: #e63946;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.icon-btn:hover {
-    background: rgba(230, 57, 70, 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(230, 57, 70, 0.2);
-}
-
-.notification-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: linear-gradient(135deg, #ff3c3c, #e63946);
-    color: white;
-    font-size: 10px;
-    font-weight: 600;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid white;
-    box-shadow: 0 2px 8px rgba(230, 57, 70, 0.4);
-}
-
-/* === PROFILE BUTTON === */
-.profile-btn {
-    background: rgba(230, 57, 70, 0.08);
-    border: 1px solid rgba(230, 57, 70, 0.1);
-    border-radius: 12px;
-    padding: 8px 15px;
-    font-weight: 500;
-    color: #2c3e50;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: all 0.3s ease;
-}
-
-.profile-btn:hover {
-    background: rgba(230, 57, 70, 0.15);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(230, 57, 70, 0.15);
-}
-
-.profile-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #e63946, #ff3c3c);
-    color: white;
-    font-size: 16px;
-    flex-shrink: 0;
-    border: 2px solid white;
-    box-shadow: 0 2px 8px rgba(230, 57, 70, 0.2);
-}
-
-.profile-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.profile-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.profile-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #2c3e50;
-    line-height: 1.2;
-}
-
-.profile-role {
-    font-size: 11px;
-    color: #6c757d;
-    font-weight: 400;
-}
-
-/* === ELITE DROPDOWN === */
-.elite-dropdown {
-    min-width: 280px;
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    padding: 10px;
-    margin-top: 10px;
-    background: white;
-}
-
-.elite-dropdown .dropdown-header {
-    padding: 15px;
-    background: linear-gradient(135deg, rgba(230, 57, 70, 0.1), rgba(255, 60, 60, 0.05));
-    border-radius: 12px;
-    margin-bottom: 10px;
-}
-
-.profile-avatar-lg {
-    width: 45px;
-    height: 45px;
-    border-radius: 12px;
-    overflow: hidden;
-    background: linear-gradient(135deg, #e63946, #ff3c3c);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 18px;
-    border: 2px solid white;
-    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
-}
-
-.profile-avatar-lg img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.elite-dropdown .dropdown-item {
-    padding: 12px 15px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    color: #2c3e50;
-}
-
-.elite-dropdown .dropdown-item:hover {
-    background: rgba(230, 57, 70, 0.08);
-    transform: translateX(5px);
-}
-
-.elite-dropdown .dropdown-item i {
-    width: 20px;
-    color: #e63946;
-}
-
-.elite-dropdown .dropdown-divider {
-    margin: 8px 0;
-    border-color: rgba(0, 0, 0, 0.05);
-}
-
-/* === MAIN CONTENT RESPONSIF === */
+  content: '';
+  position: absolute;
+  top: -60px; left: 50%;
+  transform: translateX(-50%);
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle grid texture */
+.sidebar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sidebar.is-collapsed { width: var(--sb-w-c); }
+
+/* ============================================
+   LOGO
+   ============================================ */
+.sb-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--sb-border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.sb-logo-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(96,165,250,0.4), 0 4px 16px rgba(59,130,246,0.35);
+}
+
+.sb-logo-img img { width: 100%; height: 100%; object-fit: cover; }
+.sb-logo-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 20px;
+}
+
+.sb-logo-text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.25s, width 0.3s;
+}
+
+.sidebar.is-collapsed .sb-logo-text { opacity: 0; width: 0; pointer-events: none; }
+
+.sb-school-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.06em;
+}
+
+.sb-school-tag {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--sb-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+/* ============================================
+   TOGGLE BUTTON
+   ============================================ */
+.sb-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 24px);
+  margin: 10px 12px;
+  padding: 9px 12px;
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.18);
+  border-radius: 10px;
+  color: var(--sb-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sb-toggle i { font-size: 15px; color: var(--sb-accent-2); flex-shrink: 0; transition: transform 0.3s; }
+.sb-toggle:hover { background: rgba(59,130,246,0.16); border-color: rgba(59,130,246,0.4); color: #fff; }
+.sb-toggle:hover i { transform: rotate(90deg); }
+.sidebar.is-collapsed .sb-toggle { justify-content: center; padding: 9px; }
+.sidebar.is-collapsed .sb-toggle .sb-lbl { display: none; }
+
+/* ============================================
+   MENU AREA
+   ============================================ */
+.sb-menu {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px 10px 10px;
+  position: relative;
+  z-index: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59,130,246,0.4) transparent;
+}
+
+.sb-menu::-webkit-scrollbar { width: 4px; }
+.sb-menu::-webkit-scrollbar-track { background: transparent; }
+.sb-menu::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.35); border-radius: 4px; }
+
+/* Section labels */
+.sb-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--sb-text-dim);
+  padding: 14px 10px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.25s;
+}
+
+.sidebar.is-collapsed .sb-section-label { opacity: 0; height: 4px; padding: 2px 0; }
+
+/* ============================================
+   NAV LINKS
+   ============================================ */
+.sb-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 10px;
+  color: var(--sb-text);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 2px;
+}
+
+.sb-link:hover {
+  background: rgba(59,130,246,0.1);
+  color: #e0eaff;
+}
+
+.sb-link.is-active {
+  background: var(--sb-accent-soft);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(59,130,246,0.2);
+}
+
+.sb-link.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: linear-gradient(180deg, #60a5fa, #3b82f6);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 8px rgba(96,165,250,0.6);
+}
+
+/* Icons */
+.sb-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  background: rgba(59,130,246,0.08);
+  color: rgba(148,172,220,0.6);
+  transition: all 0.18s;
+}
+
+.sb-link:hover .sb-icon,
+.sb-link.is-active .sb-icon {
+  background: rgba(59,130,246,0.22);
+  color: #93c5fd;
+}
+
+/* Text label */
+.sb-link .sb-lbl {
+  flex: 1;
+  transition: opacity 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar.is-collapsed .sb-link .sb-lbl,
+.sidebar.is-collapsed .sb-arrow { opacity: 0; width: 0; pointer-events: none; }
+
+.sidebar.is-collapsed .sb-link { justify-content: center; padding: 9px; }
+.sidebar.is-collapsed .sb-icon { margin: 0; }
+
+/* Arrow */
+.sb-arrow {
+  font-size: 11px;
+  color: var(--sb-text-dim);
+  transition: transform 0.25s, opacity 0.2s;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   DROPDOWN
+   ============================================ */
+.sb-drop { margin-bottom: 2px; }
+
+.sb-drop-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+  overflow: hidden;
+  padding-left: 12px;
+  margin-top: 2px;
+}
+
+.sb-drop-panel > div { min-height: 0; overflow: hidden; }
+
+.sb-drop.is-open .sb-drop-panel { grid-template-rows: 1fr; }
+.sb-drop.is-open .sb-arrow { transform: rotate(180deg); }
+
+.sb-drop.is-open > .sb-link {
+  background: rgba(59,130,246,0.1);
+  color: #e0eaff;
+}
+
+.sb-drop.is-open > .sb-link .sb-icon {
+  background: rgba(59,130,246,0.2);
+  color: #93c5fd;
+}
+
+/* Sub-items */
+.sb-sub {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: rgba(148,172,220,0.7);
+  font-size: 12.5px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: all 0.18s;
+  margin-bottom: 1px;
+  position: relative;
+  border-left: 1px solid rgba(59,130,246,0.12);
+  margin-left: 4px;
+}
+
+.sb-sub i { font-size: 13px; color: rgba(148,172,220,0.35); width: 16px; text-align: center; flex-shrink: 0; }
+
+.sb-sub:hover {
+  background: rgba(59,130,246,0.1);
+  color: #e0eaff;
+  padding-left: 14px;
+  border-left-color: rgba(59,130,246,0.5);
+}
+
+.sb-sub:hover i { color: #93c5fd; }
+
+.sb-sub.is-active {
+  background: var(--sb-accent-soft);
+  color: #fff;
+  border-left-color: var(--sb-accent);
+  font-weight: 600;
+}
+
+.sb-sub.is-active i { color: #93c5fd; }
+
+.sidebar.is-collapsed .sb-drop-panel { display: none; }
+
+/* ============================================
+   BOTTOM USER STRIP
+   ============================================ */
+.sb-user-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--sb-border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  background: rgba(14,30,61,0.6);
+  backdrop-filter: blur(4px);
+  overflow: hidden;
+}
+
+.sb-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(96,165,250,0.3);
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.15);
+}
+
+.sb-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.sb-user-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.25s, width 0.3s;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sidebar.is-collapsed .sb-user-info { opacity: 0; width: 0; }
+
+.sb-user-name { font-size: 12.5px; font-weight: 600; color: #e0eaff; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-role { font-size: 10.5px; color: var(--sb-text-dim); margin-top: 1px; }
+
+.sb-logout {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+  color: #93c5fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.sb-logout:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); color: #fca5a5; }
+.sidebar.is-collapsed .sb-logout { margin: 0 auto; }
+
+/* ============================================
+   TOPBAR
+   ============================================ */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: var(--sb-w, 268px);
+  right: 0;
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #dde4f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 999;
+  transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
+  gap: 16px;
+  box-shadow: 0 1px 12px rgba(14,30,80,0.07);
+}
+
+.sidebar.is-collapsed ~ .topbar,
+.topbar.is-collapsed { left: 72px; }
+
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+
+.topbar-page {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-page-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  border: 1px solid #bfdbfe;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.12);
+}
+
+.topbar-page-name {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0e1e3d;
+  line-height: 1.2;
+  font-family: 'Sora', sans-serif;
+}
+
+.topbar-breadcrumb {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+/* Right side */
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.topbar-date {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: #4b5e80;
+  font-weight: 500;
+  background: #f0f5ff;
+  border: 1px solid #dbeafe;
+  border-radius: 9px;
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+
+.topbar-date i { color: #3b82f6; }
+
+/* Profile button */
+.topbar-profile { position: relative; }
+
+.topbar-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  background: #f0f5ff;
+  border: 1px solid #dbeafe;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.topbar-profile-btn:hover { background: #e0eaff; border-color: #93c5fd; }
+
+.topbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+}
+
+.topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.topbar-profile-info { display: flex; flex-direction: column; align-items: flex-start; }
+.topbar-name { font-size: 13px; font-weight: 600; color: #0e1e3d; line-height: 1.2; }
+.topbar-role { font-size: 11px; color: #7c9cbf; }
+.topbar-caret { font-size: 11px; color: #93c5fd; transition: transform 0.2s; }
+.topbar-profile.is-open .topbar-caret { transform: rotate(180deg); }
+
+/* Dropdown menu */
+.topbar-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: #fff;
+  border: 1px solid #dde4f0;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(14,30,80,0.13);
+  padding: 8px;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+  pointer-events: none;
+  transition: all 0.18s ease;
+  z-index: 1001;
+}
+
+.topbar-profile.is-open .topbar-dropdown {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+
+.topbar-dd-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-radius: 10px;
+  margin-bottom: 6px;
+  border: 1px solid #bfdbfe;
+}
+
+.topbar-dd-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(37,99,235,0.3);
+}
+
+.topbar-dd-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.topbar-dd-name { font-size: 13.5px; font-weight: 700; color: #0e1e3d; margin: 0 0 2px; }
+.topbar-dd-email { font-size: 11.5px; color: #5a7a9e; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; }
+
+.topbar-dd-divider { height: 1px; background: #edf0f7; margin: 4px 0; }
+
+.topbar-dd-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #1e3a5f;
+  text-decoration: none;
+  transition: all 0.15s;
+  font-weight: 500;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  text-align: left;
+}
+
+.topbar-dd-item i { font-size: 14px; color: #93c5fd; width: 18px; }
+.topbar-dd-item:hover { background: #eff6ff; color: #1d4ed8; }
+.topbar-dd-item:hover i { color: #3b82f6; }
+.topbar-dd-logout { color: #dc2626; }
+.topbar-dd-logout i { color: #fca5a5; }
+.topbar-dd-logout:hover { background: #fef2f2; color: #dc2626; }
+
+/* ============================================
+   MAIN CONTENT OFFSET
+   ============================================ */
 .main-content {
-    margin-left: 260px;
-    margin-top: 70px;
-    padding: 30px;
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    min-height: calc(100vh - 70px);
+  margin-left: 268px;
+  margin-top: 64px;
+  transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1);
+  min-height: calc(100vh - 64px);
 }
 
-.main-content.collapsed {
-    margin-left: 80px;
+.main-content.is-collapsed { margin-left: 72px; }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+  .sidebar { width: 72px; }
+  .main-content { margin-left: 72px; }
+  .topbar { left: 72px; }
+  .topbar-date { display: none; }
 }
 
-/* === RESPONSIVE === */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 80px;
-    }
-    .sidebar .logo-text {
-        display: none;
-    }
-    .navbar-top {
-        width: calc(100% - 80px);
-        left: 80px;
-    }
-    .main-content {
-        margin-left: 80px;
-        padding: 20px;
-    }
-    .profile-info {
-        display: none;
-    }
-}
-
-@media (max-width: 576px) {
-    .breadcrumb-section h5 {
-        font-size: 14px;
-    }
-    .navbar-top {
-        padding: 0 15px;
-    }
+@media (max-width: 600px) {
+  .topbar-profile-info { display: none; }
+  .topbar-caret { display: none; }
 }
 </style>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // ==========================================
-    // TOGGLE SIDEBAR (COLLAPSE/EXPAND)
-    // ==========================================
-    const toggleBtn = document.getElementById('toggleSidebar');
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.querySelector('.main-content');
-    
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', function() {
-            sidebar.classList.toggle('collapsed');
-            if (mainContent) {
-                mainContent.classList.toggle('collapsed');
-            }
-            
-            // Close all dropdowns when collapsing sidebar
-            if (sidebar.classList.contains('collapsed')) {
-                document.querySelectorAll('.nav-item-elite-red-dropdown').forEach(item => {
-                    item.classList.remove('active');
-                    const menu = item.querySelector('.elite-red-inline-dropdown-menu');
-                    if (menu) {
-                        menu.classList.remove('show');
-                        menu.style.display = 'none'; // ← FIX: Force hide
-                    }
-                });
-            }
-        });
+document.addEventListener('DOMContentLoaded', function () {
+
+  /* ── elements ── */
+  const sidebar     = document.getElementById('sidebar');
+  const toggleBtn   = document.getElementById('toggleSidebar');
+  const topbar      = document.getElementById('mainHeader');
+  const mainContent = document.querySelector('.main-content');
+
+  /* ── COLLAPSE STATE ── */
+  const COLL_KEY = 'sb_collapsed';
+  if (localStorage.getItem(COLL_KEY) === '1') {
+    sidebar.classList.add('is-collapsed');
+    topbar && topbar.classList.add('is-collapsed');
+    mainContent && mainContent.classList.add('is-collapsed');
+  }
+
+  toggleBtn && toggleBtn.addEventListener('click', function () {
+    sidebar.classList.toggle('is-collapsed');
+    topbar && topbar.classList.toggle('is-collapsed');
+    mainContent && mainContent.classList.toggle('is-collapsed');
+    localStorage.setItem(COLL_KEY, sidebar.classList.contains('is-collapsed') ? '1' : '0');
+  });
+
+  /* ── DROPDOWNS ── */
+  document.querySelectorAll('.sb-drop-toggle').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (sidebar.classList.contains('is-collapsed')) return;
+      const drop = this.closest('.sb-drop');
+      const isOpen = drop.classList.contains('is-open');
+
+      document.querySelectorAll('.sb-drop.is-open').forEach(d => {
+        if (d !== drop) d.classList.remove('is-open');
+      });
+
+      drop.classList.toggle('is-open', !isOpen);
+    });
+  });
+
+  /* ── PROFILE DROPDOWN ── */
+  const profileWrap = document.getElementById('profileDropdown');
+  const profileBtn  = document.getElementById('profileBtn');
+
+  profileBtn && profileBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    profileWrap.classList.toggle('is-open');
+  });
+
+  document.addEventListener('click', function (e) {
+    if (profileWrap && !profileWrap.contains(e.target)) {
+      profileWrap.classList.remove('is-open');
     }
+  });
 
-    // ==========================================
-    // DROPDOWN TOGGLE WITH SMOOTH ANIMATION (FIXED)
-    // ==========================================
-    const dropdownToggles = document.querySelectorAll('.elite-red-dropdown-toggle');
-    
-    dropdownToggles.forEach(toggle => {
-        toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Don't toggle if sidebar is collapsed
-            if (sidebar.classList.contains('collapsed')) {
-                return;
-            }
-            
-            const parentItem = this.closest('.nav-item-elite-red-dropdown');
-            const dropdownMenu = parentItem.querySelector('.elite-red-inline-dropdown-menu');
-            const isActive = parentItem.classList.contains('active');
-            
-            // Close all other dropdowns with smooth transition
-            document.querySelectorAll('.nav-item-elite-red-dropdown').forEach(item => {
-                if (item !== parentItem && item.classList.contains('active')) {
-                    item.classList.remove('active');
-                    const menu = item.querySelector('.elite-red-inline-dropdown-menu');
-                    if (menu) {
-                        menu.classList.remove('show');
-                        // Hide immediately untuk menu lain
-                        menu.style.display = 'none';
-                    }
-                }
-            });
-            
-            // Toggle current dropdown with animation (FIXED LOGIC)
-            if (isActive) {
-                // Close dropdown - remove class dulu, tunggu animasi, baru hide
-                parentItem.classList.remove('active');
-                dropdownMenu.classList.remove('show');
-                // Tunggu transition selesai (400ms sesuai CSS)
-                setTimeout(() => {
-                    dropdownMenu.style.display = 'none';
-                }, 400);
-            } else {
-                // Open dropdown - show dulu, terus add class
-                dropdownMenu.style.display = 'flex'; // ← FIX: Display flex dulu
-                parentItem.classList.add('active');
-                
-                // Small delay untuk smooth animation
-                setTimeout(() => {
-                    dropdownMenu.classList.add('show');
-                }, 10);
-            }
-        });
-        
-        // Add hover effect for better UX
-        toggle.addEventListener('mouseenter', function() {
-            if (!sidebar.classList.contains('collapsed')) {
-                this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            }
-        });
-    });
-
-    // ==========================================
-    // AUTO-OPEN ACTIVE DROPDOWN ON PAGE LOAD
-    // ==========================================
-    const activeDropdown = document.querySelector('.nav-item-elite-red-dropdown.active');
-    if (activeDropdown && !sidebar.classList.contains('collapsed')) {
-        const menu = activeDropdown.querySelector('.elite-red-inline-dropdown-menu');
-        if (menu) {
-            // Set display flex dulu
-            menu.style.display = 'flex';
-            // Delay untuk ensure smooth initial animation
-            setTimeout(() => {
-                menu.classList.add('show');
-            }, 300);
-        }
+  /* ── KEYBOARD ── */
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+      e.preventDefault();
+      toggleBtn && toggleBtn.click();
     }
-
-    // ==========================================
-    // SMOOTH HOVER EFFECT FOR NAV LINKS
-    // ==========================================
-    const navLinks = document.querySelectorAll('.nav-link:not(.elite-red-dropdown-toggle)');
-    navLinks.forEach(link => {
-        link.addEventListener('mouseenter', function() {
-            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        });
-        
-        link.addEventListener('mouseleave', function() {
-            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        });
-    });
-
-    // ==========================================
-    // DROPDOWN ITEMS ANIMATION
-    // ==========================================
-    const dropdownItems = document.querySelectorAll('.elite-red-dropdown-item');
-    dropdownItems.forEach((item, index) => {
-        item.addEventListener('mouseenter', function() {
-            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        });
-        
-        item.addEventListener('mouseleave', function() {
-            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        });
-    });
-
-    // ==========================================
-    // PREVENT DROPDOWN CLOSE WHEN CLICKING INSIDE
-    // ==========================================
-    document.querySelectorAll('.elite-red-inline-dropdown-menu').forEach(menu => {
-        menu.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-    });
-
-    // ==========================================
-    // CLOSE DROPDOWN WHEN CLICKING OUTSIDE (FIXED)
-    // ==========================================
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.nav-item-elite-red-dropdown')) {
-            document.querySelectorAll('.nav-item-elite-red-dropdown.active').forEach(item => {
-                item.classList.remove('active');
-                const menu = item.querySelector('.elite-red-inline-dropdown-menu');
-                if (menu) {
-                    menu.classList.remove('show');
-                    // Tunggu animasi selesai baru hide
-                    setTimeout(() => {
-                        menu.style.display = 'none';
-                    }, 400);
-                }
-            });
-        }
-    });
-
-    // ==========================================
-    // SMOOTH SCROLL FOR SIDEBAR MENU
-    // ==========================================
-    const sidebarMenu = document.querySelector('.sidebar-menu');
-    if (sidebarMenu) {
-        let isScrolling = false;
-        
-        sidebarMenu.addEventListener('scroll', function() {
-            if (!isScrolling) {
-                window.requestAnimationFrame(function() {
-                    // Add custom scroll behavior here if needed
-                    isScrolling = false;
-                });
-                isScrolling = true;
-            }
-        });
+    if (e.key === 'Escape') {
+      profileWrap && profileWrap.classList.remove('is-open');
     }
+  });
 
-    // ==========================================
-    // LOGO ANIMATION ON HOVER
-    // ==========================================
-    const logoContainer = document.querySelector('.logo-container');
-    if (logoContainer) {
-        logoContainer.addEventListener('mouseenter', function() {
-            if (!sidebar.classList.contains('collapsed')) {
-                this.style.transform = 'scale(1.05) rotate(5deg)';
-            }
-        });
-        
-        logoContainer.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1) rotate(0deg)';
-        });
+  /* ── AUTO-COLLAPSE ON MOBILE ── */
+  function checkMobile() {
+    if (window.innerWidth <= 900) {
+      sidebar.classList.add('is-collapsed');
+      topbar && topbar.classList.add('is-collapsed');
+      mainContent && mainContent.classList.add('is-collapsed');
     }
+  }
+  checkMobile();
+  let resizeT;
+  window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(checkMobile, 200); });
 
-    // ==========================================
-    // RESPONSIVE: AUTO-COLLAPSE ON MOBILE
-    // ==========================================
-    function handleResponsive() {
-        if (window.innerWidth <= 768) {
-            sidebar.classList.add('collapsed');
-            if (mainContent) {
-                mainContent.classList.add('collapsed');
-            }
-        }
-    }
-    
-    // Check on load
-    handleResponsive();
-    
-    // Check on resize with debounce
-    let resizeTimer;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function() {
-            handleResponsive();
-        }, 250);
+  /* ── COLLAPSED TOOLTIP ── */
+  document.querySelectorAll('.sb-link').forEach(link => {
+    const lbl = link.querySelector('.sb-lbl');
+    if (!lbl) return;
+    link.addEventListener('mouseenter', function () {
+      if (!sidebar.classList.contains('is-collapsed')) return;
+      let tip = document.createElement('div');
+      tip.className = 'sb-tooltip';
+      tip.textContent = lbl.textContent.trim();
+      tip.style.cssText = 'position:fixed;left:80px;background:#0e1e3d;color:#e0eaff;padding:6px 12px;border-radius:8px;font-size:12.5px;font-weight:500;z-index:9999;pointer-events:none;box-shadow:0 4px 16px rgba(14,30,80,0.3);white-space:nowrap;border:1px solid rgba(59,130,246,0.2);';
+      const r = this.getBoundingClientRect();
+      tip.style.top = (r.top + r.height / 2 - 14) + 'px';
+      document.body.appendChild(tip);
+      link._tip = tip;
     });
-
-    // ==========================================
-    // TOGGLE ICON ANIMATION
-    // ==========================================
-    const toggleIcons = document.querySelectorAll('.toggle-icon');
-    toggleIcons.forEach(icon => {
-        const parentDropdown = icon.closest('.nav-item-elite-red-dropdown');
-        if (parentDropdown) {
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.attributeName === 'class') {
-                        if (parentDropdown.classList.contains('active')) {
-                            icon.style.transform = 'rotate(90deg)';
-                        } else {
-                            icon.style.transform = 'rotate(0deg)';
-                        }
-                    }
-                });
-            });
-            
-            observer.observe(parentDropdown, {
-                attributes: true
-            });
-        }
+    link.addEventListener('mouseleave', function () {
+      if (link._tip) { link._tip.remove(); link._tip = null; }
     });
-
-    // ==========================================
-    // DROPDOWN MENU HEIGHT AUTO-ADJUST
-    // ==========================================
-    function adjustDropdownHeight() {
-        document.querySelectorAll('.elite-red-inline-dropdown-menu.show').forEach(menu => {
-            const items = menu.querySelectorAll('.elite-red-dropdown-item');
-            const totalHeight = Array.from(items).reduce((sum, item) => {
-                return sum + item.offsetHeight + 3; // 3px is margin-bottom
-            }, 0);
-            
-            menu.style.maxHeight = (totalHeight + 20) + 'px'; // 20px for padding
-        });
-    }
-    
-    // Adjust on dropdown open
-    const dropdownObserver = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.attributeName === 'class') {
-                const target = mutation.target;
-                if (target.classList.contains('show')) {
-                    setTimeout(adjustDropdownHeight, 100);
-                }
-            }
-        });
-    });
-    
-    document.querySelectorAll('.elite-red-inline-dropdown-menu').forEach(menu => {
-        dropdownObserver.observe(menu, {
-            attributes: true
-        });
-    });
-
-    // ==========================================
-    // SMOOTH PAGE TRANSITION
-    // ==========================================
-    document.querySelectorAll('a[href]').forEach(link => {
-        // Skip external links and links with target attribute
-        if (link.hostname === window.location.hostname && !link.hasAttribute('target')) {
-            link.addEventListener('click', function(e) {
-                // Add fade out effect before navigation
-                const href = this.getAttribute('href');
-                if (href && href !== '#' && !href.startsWith('javascript:')) {
-                    document.body.style.opacity = '0.8';
-                    document.body.style.transition = 'opacity 0.2s ease';
-                }
-            });
-        }
-    });
-
-    // ==========================================
-    // KEYBOARD NAVIGATION SUPPORT
-    // ==========================================
-    document.addEventListener('keydown', function(e) {
-        // Toggle sidebar with Ctrl + B
-        if (e.ctrlKey && e.key === 'b') {
-            e.preventDefault();
-            if (toggleBtn) {
-                toggleBtn.click();
-            }
-        }
-        
-        // Close all dropdowns with Escape (FIXED)
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.nav-item-elite-red-dropdown.active').forEach(item => {
-                item.classList.remove('active');
-                const menu = item.querySelector('.elite-red-inline-dropdown-menu');
-                if (menu) {
-                    menu.classList.remove('show');
-                    setTimeout(() => {
-                        menu.style.display = 'none';
-                    }, 400);
-                }
-            });
-        }
-    });
-
-    // ==========================================
-    // PERFORMANCE: LAZY LOAD DROPDOWN CONTENT
-    // ==========================================
-    const observerOptions = {
-        root: null,
-        rootMargin: '50px',
-        threshold: 0.1
-    };
-    
-    const dropdownContentObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.visibility = 'visible';
-            }
-        });
-    }, observerOptions);
-    
-    document.querySelectorAll('.elite-red-inline-dropdown-menu').forEach(menu => {
-        dropdownContentObserver.observe(menu);
-    });
-
-    // ==========================================
-    // HIGHLIGHT ACTIVE MENU ON SCROLL (OPTIONAL)
-    // ==========================================
-    function highlightActiveMenu() {
-        const scrollPosition = window.scrollY;
-        const windowHeight = window.innerHeight;
-        
-        // Add glow effect to active menu items
-        document.querySelectorAll('.nav-link.active').forEach(link => {
-            link.style.boxShadow = '0 4px 15px rgba(255, 123, 115, 0.3)';
-        });
-    }
-    
-    // Throttled scroll event
-    let scrollTimeout;
-    window.addEventListener('scroll', function() {
-        if (!scrollTimeout) {
-            scrollTimeout = setTimeout(function() {
-                highlightActiveMenu();
-                scrollTimeout = null;
-            }, 100);
-        }
-    });
-
-    // ==========================================
-    // PROFILE DROPDOWN ANIMATION
-    // ==========================================
-    const profileBtn = document.querySelector('.profile-btn');
-    if (profileBtn) {
-        profileBtn.addEventListener('click', function() {
-            // Add pulse animation to profile avatar
-            const avatar = this.querySelector('.profile-avatar');
-            if (avatar) {
-                avatar.style.animation = 'pulse 0.5s ease';
-                setTimeout(() => {
-                    avatar.style.animation = '';
-                }, 500);
-            }
-        });
-    }
-
-    // ==========================================
-    // BREADCRUMB ANIMATION
-    // ==========================================
-    const breadcrumbSection = document.querySelector('.breadcrumb-section');
-    if (breadcrumbSection) {
-        breadcrumbSection.style.opacity = '0';
-        breadcrumbSection.style.transform = 'translateY(-10px)';
-        
-        setTimeout(() => {
-            breadcrumbSection.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-            breadcrumbSection.style.opacity = '1';
-            breadcrumbSection.style.transform = 'translateY(0)';
-        }, 200);
-    }
-
-    // ==========================================
-    // MENU ITEMS STAGGERED ANIMATION ON LOAD
-    // ==========================================
-    const menuItems = document.querySelectorAll('.sidebar-menu > .nav-link, .sidebar-menu > .nav-item-elite-red-dropdown');
-    menuItems.forEach((item, index) => {
-        item.style.opacity = '0';
-        item.style.transform = 'translateX(-20px)';
-        
-        setTimeout(() => {
-            item.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-            item.style.opacity = '1';
-            item.style.transform = 'translateX(0)';
-        }, 100 + (index * 50));
-    });
-
-    // ==========================================
-    // TOOLTIP FOR COLLAPSED SIDEBAR (OPTIONAL)
-    // ==========================================
-    function showTooltip() {
-        if (sidebar.classList.contains('collapsed')) {
-            navLinks.forEach(link => {
-                link.addEventListener('mouseenter', function() {
-                    const text = this.querySelector('.link-text');
-                    if (text) {
-                        const tooltip = document.createElement('div');
-                        tooltip.className = 'sidebar-tooltip';
-                        tooltip.textContent = text.textContent;
-                        tooltip.style.cssText = `
-                            position: fixed;
-                            left: 90px;
-                            background: #2c3e50;
-                            color: white;
-                            padding: 8px 12px;
-                            border-radius: 8px;
-                            font-size: 13px;
-                            font-weight: 500;
-                            z-index: 10000;
-                            pointer-events: none;
-                            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                            white-space: nowrap;
-                        `;
-                        
-                        const rect = this.getBoundingClientRect();
-                        tooltip.style.top = rect.top + (rect.height / 2) - 20 + 'px';
-                        
-                        document.body.appendChild(tooltip);
-                        
-                        this.addEventListener('mouseleave', function() {
-                            tooltip.remove();
-                        }, { once: true });
-                    }
-                });
-            });
-        }
-    }
-    
-    // Initialize tooltips
-    showTooltip();
-    
-    // Re-initialize tooltips when sidebar is toggled
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', function() {
-            setTimeout(showTooltip, 400);
-        });
-    }
-
-    // ==========================================
-    // CONSOLE LOG: NAVIGATION LOADED
-    // ==========================================
-    console.log('%c✅ Elite Navigation System Loaded Successfully!', 
-        'color: #4CAF50; font-weight: bold; font-size: 14px; padding: 10px; background: #f0f0f0; border-radius: 5px;');
-    console.log('%c🎨 Smooth animations and interactions are ready!', 
-        'color: #2196F3; font-size: 12px;');
-    console.log('%c📊 FIXED: Dropdown display logic now working perfectly!', 
-        'color: #FF9800; font-size: 12px;');
+  });
 
 });
 </script>

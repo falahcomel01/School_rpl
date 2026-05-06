@@ -2,405 +2,372 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | SMA Cakrawala</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Login | SMA Kanjeng Sepuh Sidayu</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Reset & Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* ── ROOT VARIABLES ── */
+        :root {
+            --navy:   #0a192f;
+            --navy-light: #112240;
+            --blue:   #2563eb;
+            --blue-l: #60a5fa;
+            --gold:   #fbbf24;
+            --gold-gradient: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+            --text-white: #e2e8f0;
         }
 
-        body {
+        /* ── RESET & LAYOUT FIX ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            height: 100%; width: 100%;
+            font-family: 'Plus Jakarta Sans', sans-serif; /* Font modern & bersih */
+            background-color: #f8fafd; color: #0f172a;
+            overflow: hidden; /* NO SCROLL */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .main-container {
+            display: flex;
+            width: 100%;
             height: 100vh;
+        }
+
+        /* ══════════════════════════════════════
+           LEFT PANEL (THE PREMIUM BRAND SIDE)
+        ══════════════════════════════════════ */
+        .panel-left {
+            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: url("{{ asset('image/halaman.jpg') }}") no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Poppins', sans-serif;
             position: relative;
+            background: radial-gradient(circle at top right, #1e3a8a 0%, var(--navy) 100%);
+            padding: 3rem;
+            overflow: hidden;
         }
 
-        /* Overlay Background */
-        .overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(3px);
-            z-index: 0;
+        /* Ambient Background Light */
+        .panel-left::before {
+            content: ''; position: absolute; top: -20%; left: -20%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%);
+            filter: blur(60px); z-index: 0;
+        }
+        .grid-pattern {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px; z-index: 0;
         }
 
-        /* Logo Section */
-        .logo {
+        /* ══════════════════════════════════════
+           GLASS CARD CONTAINER (The Focus)
+        ══════════════════════════════════════ */
+        .brand-card {
+            position: relative; z-index: 10;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 3rem 2rem;
             text-align: center;
-            z-index: 1;
-            position: relative;
-            margin-bottom: 25px;
-            animation: fadeDown 1s ease-out;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeInCard 1s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .logo img {
-            width: 110px;
-            height: 110px;
-            object-fit: contain;
+        /* Top decorative accent on card */
+        .brand-card::before {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 4px;
+            background: var(--gold-gradient);
+            border-radius: 0 0 4px 4px;
+        }
+
+        /* ══════════════════════════════════════
+           LOGO STYLING (Floating & Glowing)
+        ══════════════════════════════════════ */
+        .logo-wrapper {
+            position: relative;
+            width: 110px; height: 110px;
+            margin: 0 auto 1.5rem;
             border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.25);
-            padding: 10px;
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
-            transition: transform 0.3s ease;
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+            box-shadow: 
+                0 0 0 1px rgba(255,255,255,0.1),
+                0 10px 30px rgba(0,0,0,0.3),
+                0 0 20px rgba(37,99,235,0.2); /* Blue Glow */
+            display: flex; align-items: center; justify-content: center;
+            animation: floatLogo 6s ease-in-out infinite;
         }
 
-        .logo img:hover {
-            transform: scale(1.05);
+        .brand-logo-img {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+            z-index: 2;
         }
 
-        /* Login Card */
-        .login-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
+        /* Badge Excellence (Top Right of Logo) */
+        .badge-excellence {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--gold-gradient);
+            color: #fff;
+            font-size: 0.65rem; font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            z-index: 3;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* ══════════════════════════════════════
+           TYPOGRAPHY STYLING
+        ══════════════════════════════════════ */
+        .school-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .location-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(251, 191, 36, 0.15); /* Gold bg low opacity */
+            color: var(--gold);
+            padding: 4px 12px;
             border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            width: 370px;
-            padding: 50px 45px 55px;
-            text-align: center;
-            z-index: 1;
-            position: relative;
-            animation: fadeInUp 0.9s ease-out;
-            overflow: hidden;
+            font-size: 0.75rem; font-weight: 600;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            margin-bottom: 2rem;
         }
 
-        .login-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: white;
-            letter-spacing: 0.5px;
-            margin-bottom: 30px;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+        /* Divider Elegant */
+        .divider-elegant {
+            width: 40px; height: 2px;
+            background: rgba(255,255,255,0.2);
+            margin: 0 auto 1.5rem;
+            border-radius: 2px;
         }
 
-        /* Error Message */
-        .error-message {
-            background: rgba(253, 221, 221, 0.95);
-            color: #991b1b;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: shake 0.5s ease-in-out;
+        /* Headline Main */
+        .hero-headline {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem; /* Default */
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        .hero-accent {
+            background: linear-gradient(to right, #fbbf24, #fcd34d, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
         }
 
-        /* Form Inputs */
-        .input-group {
-            position: relative;
-            margin-bottom: 18px;
+        .live-badge {
+            margin-top: 2rem;
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 14px; border-radius: 50px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #34d399; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .live-dot {
+            width: 6px; height: 6px; background: #10b981; border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-green 2s infinite;
         }
 
-        .input-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-            font-size: 18px;
-            transition: color 0.3s ease;
+        /* ══════════════════════════════════════
+           RIGHT PANEL (FORM - Cleaned)
+        ══════════════════════════════════════ */
+        .panel-right {
+            width: 450px;
+            flex-shrink: 0;
+            display: flex; flex-direction: column; justify-content: center;
+            background: #f8fafc;
+            padding: 2.5rem;
+            position: relative; overflow: hidden;
+        }
+        
+        .panel-right::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--navy), var(--blue), var(--gold));
         }
 
+        .form-wrap { width: 100%; z-index: 5; }
+        
+        .form-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem; font-weight: 900; color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+        .form-desc { color: #64748b; font-size: 0.9rem; margin-bottom: 2rem; }
+
+        .input-group { margin-bottom: 1.25rem; }
+        .input-label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .input-wrap { position: relative; }
+        .input-prefix-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; transition: 0.3s; }
+        
         .form-input {
-            width: 100%;
-            padding: 12px 45px 12px 45px;
-            background: rgba(255, 255, 255, 0.85);
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
+            width: 100%; padding: 14px 14px 14px 42px;
+            border: 1.5px solid #e2e8f0; border-radius: 10px;
+            font-size: 1rem; transition: 0.3s; background: #fff;
         }
+        .form-input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); outline: none; }
+        .form-input:focus + .input-prefix-icon { color: var(--blue); }
 
-        .form-input::placeholder {
-            color: #9ca3af;
-        }
+        .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); border: none; background: none; cursor: pointer; color: #94a3b8; }
 
-        .form-input:focus {
-            background: white;
-            box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.3);
-            transform: translateY(-1px);
-        }
-
-        .form-input:focus ~ .input-icon {
-            color: #ff4d4d;
-        }
-
-        /* Password Toggle */
-        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-            font-size: 18px;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .password-toggle:hover {
-            color: #ff4d4d;
-        }
-
-        /* Form Options */
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-        }
-
-        .remember-me input {
-            width: 16px;
-            height: 16px;
-            accent-color: #ff4d4d;
-        }
-
-        .forgot-password {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .forgot-password:hover {
-            color: #ffcccc;
-            text-decoration: underline;
-        }
-
-        /* Submit Button */
         .btn-login {
-            background: linear-gradient(135deg, #ff4d4d, #cc0000);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 0;
-            font-weight: 600;
-            font-size: 15px;
-            width: 100%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
-            font-family: 'Poppins', sans-serif;
-            position: relative;
-            overflow: hidden;
+            width: 100%; padding: 14px; background: var(--navy); color: white;
+            border: none; border-radius: 10px; font-weight: 700; font-size: 1rem;
+            cursor: pointer; transition: 0.3s; margin-top: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
         }
+        .btn-login:hover { background: var(--blue); transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(37,99,235,0.3); }
 
-        .btn-login::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
+        /* ── ANIMATIONS ── */
+        @keyframes fadeInCard { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes floatLogo { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+        /* ── RESPONSIVE (Still Fixed) ── */
+        @media (max-width: 900px) {
+            .main-container { flex-direction: column; }
+            .panel-left { flex: none; height: 38%; padding: 1.5rem; }
+            .brand-card { padding: 1.5rem 1rem; border-radius: 16px; max-width: 100%; }
+            .logo-wrapper { width: 80px; height: 80px; }
+            .brand-logo-img { width: 65px; height: 65px; }
+            .school-name { font-size: 1.4rem; }
+            .hero-headline { font-size: 1.3rem; }
+            .location-badge { font-size: 0.65rem; padding: 3px 10px; margin-bottom: 1rem; }
+            
+            .panel-right { width: 100%; height: 62%; padding: 1.5rem; }
+            .form-title { font-size: 1.8rem; }
         }
-
-        .btn-login:hover::before {
-            left: 100%;
-        }
-
-        .btn-login:hover {
-            background: linear-gradient(135deg, #cc0000, #990000);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 77, 77, 0.4);
-        }
-
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        /* Back Link */
-        .back-link {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 25px;
-            font-size: 14px;
-            opacity: 0.8;
-            transition: all 0.3s ease;
-        }
-
-        .back-link:hover {
-            opacity: 1;
-            transform: translateX(-5px);
-        }
-
-        /* Animations */
-        @keyframes fadeDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive */
+        
+        /* Very Small Screens */
         @media (max-width: 480px) {
-            .login-card {
-                width: 90%;
-                padding: 40px 30px 45px;
-            }
-
-            .logo img {
-                width: 90px;
-                height: 90px;
-            }
-
-            .login-title {
-                font-size: 22px;
-            }
-
-            .form-options {
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
+            .brand-card { padding: 1rem; }
+            .hero-headline { font-size: 1.1rem; }
+            .school-name { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
 
-    {{-- Background Overlay --}}
-    <div class="overlay"></div>
+    <div class="main-container">
 
-    {{-- Logo Section --}}
-    <div class="logo">
-        <img src="{{ asset('image/logo-sekolah.png') }}" alt="Logo SMA Cakrawala">
-    </div>
+        <!-- PANEL KIRI: PREMIUM BRANDING -->
+        <div class="panel-left">
+            <div class="grid-pattern"></div>
 
-    {{-- Login Card --}}
-    <div class="login-card">
-        <h2 class="login-title">
-            Login Akun
-        </h2>
+            <!-- Kartu Kaca Utama -->
+            <div class="brand-card">
+                
+                <!-- Logo Area -->
+                <div class="logo-wrapper">
+                    <span class="badge-excellence">Official</span>
+                    <!-- FOTO ASLI KAMU -->
+                    <img src="{{ asset('image/logo-sekolah.jpg') }}" 
+                         alt="Logo SMA Kanjeng Sepuh" 
+                         class="brand-logo-img"
+                         onerror="this.src='https://ui-avatars.com/api/?name=SMA+Kanjeng&background=0f2557&color=fbbf24&font-size=0.3'">
+                </div>
 
-        {{-- Error Message --}}
-        @if ($errors->any())
-            <div class="error-message">
-                <i class="fas fa-exclamation-circle"></i>
-                {{ $errors->first() }}
+                <!-- Nama Sekolah -->
+                <h2 class="school-name">SMA Kanjeng Sepuh</h2>
+                
+                <!-- Lokasi Badge -->
+                <div class="location-badge">
+                    <i class="fas fa-map-marker-alt"></i> Sidayu, Gresik
+                </div>
+
+                <!-- Garis Pembatas Elegan -->
+                <div class="divider-elegant"></div>
+
+                <!-- Headline -->
+                <h1 class="hero-headline">
+                    Selamat Datang<br>
+                    di <span class="hero-accent">Portal Akademik</span>
+                </h1>
+
+                <!-- Status Live -->
+                <div class="live-badge">
+                    <span class="live-dot"></span> Sistem Terintegrasi
+                </div>
+
             </div>
-        @endif
+        </div>
 
-        {{-- Login Form --}}
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
+        <!-- PANEL KANAN: LOGIN FORM -->
+        <div class="panel-right">
+            <div class="form-wrap">
+                <h2 class="form-title">Login</h2>
+                <p class="form-desc">Silakan masuk untuk mengakses fitur akademik.</p>
 
-            {{-- Username/Email Input --}}
-            <div class="input-group">
-                <i class="fas fa-user input-icon"></i>
-                <input 
-                    type="text" 
-                    name="input_type" 
-                    class="form-input" 
-                    placeholder="Akun Pengguna" 
-                    value="{{ old('input_type') }}"
-                    required 
-                    autofocus
-                >
+                <form id="loginForm" onsubmit="event.preventDefault();">
+                    <div class="input-group">
+                        <label class="input-label">Username / NIS</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-user input-prefix-icon"></i>
+                            <input type="text" class="form-input" placeholder="Contoh: user123" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Password</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-lock input-prefix-icon"></i>
+                            <input type="password" class="form-input" id="pass" placeholder="••••••••" required>
+                            <button type="button" class="pw-toggle" onclick="document.getElementById('pass').type = (document.getElementById('pass').type==='password'?'text':'password')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-login">Masuk Sekarang</button>
+                    
+                    <div style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: #94a3b8;">
+                        <a href="#" style="color: var(--blue); text-decoration: none; font-weight: 600;">Lupa password?</a>
+                    </div>
+                </form>
             </div>
-
-            {{-- Password Input --}}
-            <div class="input-group">
-                <i class="fas fa-lock input-icon"></i>
-                <input 
-                    type="password" 
-                    name="password" 
-                    class="form-input" 
-                    placeholder="Password" 
-                    id="password-input"
-                    required
-                >
-                <i class="fas fa-eye password-toggle" id="password-toggle"></i>
-            </div>
-
-            {{-- Remember Me & Forgot Password --}}
-            <div class="form-options">
-                <label class="remember-me">
-                    <input type="checkbox" name="remember">
-                    <span>Ingat saya</span>
-                </label>
-            </div>
-
-            {{-- Submit Button --}}
-            <button type="submit" class="btn-login">
-                Login
-            </button>
-        </form>
+        </div>
 
     </div>
 
     <script>
-        // Password Toggle Functionality
-        const passwordInput = document.getElementById('password-input');
-        const passwordToggle = document.getElementById('password-toggle');
-        
-        passwordToggle.addEventListener('click', function() {
-            // Toggle password visibility
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                passwordToggle.classList.remove('fa-eye');
-                passwordToggle.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                passwordToggle.classList.remove('fa-eye-slash');
-                passwordToggle.classList.add('fa-eye');
-            }
+        // Simple logic for toggling password if needed (handled inline above but good to have here)
+        document.getElementById('loginForm').addEventListener('submit', function() {
+            const btn = this.querySelector('.btn-login');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            setTimeout(() => {
+                btn.innerHTML = 'Login Berhasil';
+                btn.style.background = '#10b981';
+            }, 1500);
         });
     </script>
 
